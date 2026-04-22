@@ -1,0 +1,15 @@
+[
+  {
+    "Name": "New Profile",
+    "Projects": [
+      {
+        "Path": "AYMDating.API\\AYMDating.API.csproj",
+        "Action": "Start"
+      },
+      {
+        "Path": "AYMDating.Blazor\\AYMDating.Blazor.csproj",
+        "Action": "Start"
+      }
+    ]
+  }
+]

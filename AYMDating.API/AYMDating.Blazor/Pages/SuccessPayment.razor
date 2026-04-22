@@ -1,0 +1,71 @@
+﻿@page "/successPayment"
+
+@inherits Login
+
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using Blazored.LocalStorage
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+@inject AppState _AppState
+@inject IJSRuntime JSRuntime
+@inject ILocalStorageService localStorage
+
+<PageTitle>SuccessPayment</PageTitle>
+
+<h3>SuccessPayment</h3>
+
+@code {
+    private string paymentId;
+    private string token;
+    private string payerId;
+    private bool isProcessing = true;
+    private string message;
+    private UserPaymentDTO model = new UserPaymentDTO();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            // Extract query parameters from the URL
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            var queryParams = System.Web.HttpUtility.ParseQueryString(uri.Query);
+
+            model.PaymentId = queryParams["paymentId"];
+            model.token = queryParams["token"];
+            model.PayerId = queryParams["PayerID"];
+
+            if (!string.IsNullOrEmpty(model.PaymentId) && !string.IsNullOrEmpty(model.token) && !string.IsNullOrEmpty(model.PayerId))
+            {
+                // Call API to execute the payment and save the result
+                var result = await _apiServiceLogin.ExecuteMemberShipForUser(model);
+                if (result)
+                {
+                    message = "Done, Payment processed successfully, Please Login again!.";
+                }
+                else
+                {
+                    message = "Error, ExecutePayment There was an issue processing your payment, Please Login again!.";
+                }
+                bool logout = await _apiServiceLogin.LogOutProcessAsync();
+                if (logout)
+                {
+                    await localStorage.RemoveItemAsync("AYMauthToken");
+                    Navigation.NavigateTo($"/login/{message}.");
+                }
+            }
+            else
+            {
+                message = "Error, Invalid payment parameters, Please Login again!.";
+            }
+
+            isProcessing = false;
+        }
+    }
+}
+

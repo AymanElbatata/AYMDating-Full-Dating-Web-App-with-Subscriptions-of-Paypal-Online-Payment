@@ -1,0 +1,43 @@
+﻿@page "/logOut"
+
+@using AYMDating.Blazor.Data.Helpers
+@using Blazored.LocalStorage
+
+@inject NavigationManager Navigation
+@inject ILocalStorageService localStorage
+@inject ApiServiceLogin _apiServiceLogin
+@inject AppState _AppState
+
+<PageTitle>LogOut</PageTitle>
+
+@* <h3>Logout</h3>
+ *@
+@code {
+    private async Task SignOut()
+    {
+        bool result = await _apiServiceLogin.LogOutProcessAsync();
+        if (result)
+        {
+            await localStorage.RemoveItemAsync("AYMauthToken");
+            Navigation.NavigateTo("/login");
+        }
+
+    }
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await SignOut();
+            _AppState.CurrentUserHistoryDTO = null;
+            _AppState.isAuthenticated = false;
+            StateHasChanged();
+        }
+    }
+
+
+}

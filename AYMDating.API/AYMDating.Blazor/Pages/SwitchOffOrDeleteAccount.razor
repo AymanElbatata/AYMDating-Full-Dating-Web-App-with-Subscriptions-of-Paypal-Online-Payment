@@ -1,0 +1,423 @@
+﻿@* @page "/switchOffOrDeleteAccount"
+
+@inherits Login
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using AYMDating.DAL.Entities
+@using Blazored.LocalStorage
+@using System.Net.Http.Headers
+@using System.ComponentModel.DataAnnotations
+@inject ILocalStorageService localStorage
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AppState _AppState
+@inject IJSRuntime JS
+
+
+<PageTitle>SwitchOff/Delete Account</PageTitle>
+<div class="aym-paragraph">
+    <h3>SwitchOff/Delete Account</h3>
+
+    <div class="container text-center d-flex align-content-center justify-content-center col-md-12">
+        <EditForm Model="SwitchOrDeleteModel" OnValidSubmit="HandleRegister">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="form-control text-center w-75 mb-3">
+                <label for="SwitchOrDelete">Switch Or Delete:</label>
+                <InputSelect id="Gender" @bind-Value="SwitchOrDeleteModel.SwitchOrDelete" class="w-75">
+                    <option value="1">Switch Off</option>
+                    <option value="2">Delete Permanently</option>
+
+                </InputSelect>
+            </div>
+            <div class="form-control text-center w-75 mb-3">
+                <button class="btn btn-outline-secondary" type="submit">Submit</button>
+            </div>
+        </EditForm>
+    </div>
+</div>
+
+@code {
+    private bool result = false;
+    private string Message;
+
+    private SwitchOrDeleteDTO SwitchOrDeleteModel = new SwitchOrDeleteDTO();
+    private async Task HandleRegister()
+    {
+        try
+        {
+            bool isConfirmed = await JS.InvokeAsync<bool>("showConfirmation", "Are you sure you want to do that?");
+            if (isConfirmed)
+            {
+                if (SwitchOrDeleteModel.SwitchOrDelete == 1)
+                {
+                    result = await _apiServiceLogin.SendSwitchedOffFromCurrentUser(SwitchOrDeleteModel);
+                    Message = "Your Account Has Been Switched off Successfully!.";
+                }
+                else
+                {
+                    result = await _apiServiceLogin.SendDeleteAccountFromCurrentUser(SwitchOrDeleteModel);
+                    Message = "Your Account Has Been Deleted Successfully!.";
+                }
+                if (result)
+                {
+                    await localStorage.RemoveItemAsync("AYMauthToken");
+                    _AppState.CurrentUserHistoryDTO = null;
+                    _AppState.isAuthenticated = false;
+                    StateHasChanged();
+
+                    Navigation.NavigateTo($"/login/{Message}.");
+                }
+                else
+                    await ShowAlert("Fatal Error, Please Contact us!");
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            // Handle login failure (e.g., show an error message)
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+
+    }
+}
+ *@
+
+
+ @page "/switchOffOrDeleteAccount"
+@if (_AppState.isAuthenticated)
+{
+@inherits Login
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using AYMDating.DAL.Entities
+@using Blazored.LocalStorage
+@using System.Net.Http.Headers
+@using System.ComponentModel.DataAnnotations
+@inject ILocalStorageService localStorage
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AppState _AppState
+@inject IJSRuntime JS
+
+
+<PageTitle>Account Settings - AYM Dating</PageTitle>
+
+<div class="account-settings-container">
+    <div class="settings-card">
+        <div class="settings-header">
+            <i class="fas fa-user-cog settings-icon"></i>
+            <h3>Account Settings</h3>
+            <p class="text-muted">Manage your account status</p>
+        </div>
+
+        <div class="settings-body">
+            <EditForm Model="SwitchOrDeleteModel" OnValidSubmit="HandleRegister">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="validation-summary" />
+
+                <div class="form-group">
+                    <label class="form-label">Choose an action:</label>
+                    <div class="action-cards">
+                        <div class="action-card @(SwitchOrDeleteModel.SwitchOrDelete == 1 ? "selected" : "")"
+                             @onclick="() => SwitchOrDeleteModel.SwitchOrDelete = 1">
+                            <i class="fas fa-toggle-off action-icon"></i>
+                            <h5>Switch Off</h5>
+                            <p>Temporarily deactivate your account</p>
+                            <div class="radio-indicator">
+                                <span class="@(SwitchOrDeleteModel.SwitchOrDelete == 1 ? "active" : "")"></span>
+                            </div>
+                        </div>
+
+                        <div class="action-card @(SwitchOrDeleteModel.SwitchOrDelete == 2 ? "selected" : "")"
+                             @onclick="() => SwitchOrDeleteModel.SwitchOrDelete = 2">
+                            <i class="fas fa-trash-alt action-icon"></i>
+                            <h5>Delete Permanently</h5>
+                            <p>Remove your account and all data</p>
+                            <div class="radio-indicator">
+                                <span class="@(SwitchOrDeleteModel.SwitchOrDelete == 2 ? "active" : "")"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <button class="btn-submit" type="submit">
+                        <span>Confirm Action</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </div>
+            </EditForm>
+        </div>
+
+        <div class="settings-footer">
+            <i class="fas fa-exclamation-circle"></i>
+            <small>Note: This action cannot be undone. Deleted accounts cannot be recovered.</small>
+        </div>
+    </div>
+</div>
+
+
+<style>
+    .account-settings-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 2rem;
+        background-color: #fafafa;
+    }
+
+    .settings-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        width: 100%;
+        max-width: 600px;
+        overflow: hidden;
+    }
+
+    .settings-header {
+        padding: 2rem;
+        text-align: center;
+        background: linear-gradient(135deg, #ff6b8b 0%, #ff8e53 100%);
+        color: white;
+    }
+
+    .settings-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .settings-header h3 {
+        margin: 0;
+        font-weight: 600;
+    }
+
+    .settings-header p {
+        margin: 0.5rem 0 0;
+        opacity: 0.9;
+    }
+
+    .settings-body {
+        padding: 2rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.8rem;
+        font-weight: 500;
+        color: #333;
+    }
+
+    .action-cards {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .action-card {
+        padding: 1.5rem;
+        border: 1px solid #e0e0e0;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        position: relative;
+        text-align: center;
+    }
+
+        .action-card:hover {
+            border-color: #ff6b8b;
+        }
+
+        .action-card.selected {
+            border: 2px solid #ff6b8b;
+            background-color: #fff5f7;
+        }
+
+    .action-icon {
+        font-size: 1.8rem;
+        margin-bottom: 1rem;
+        color: #ff6b8b;
+    }
+
+    .action-card h5 {
+        margin: 0.5rem 0;
+        color: #333;
+    }
+
+    .action-card p {
+        margin: 0;
+        color: #666;
+        font-size: 0.9rem;
+    }
+
+    .radio-indicator {
+        margin-top: 1rem;
+        height: 20px;
+    }
+
+        .radio-indicator span {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ccc;
+            border-radius: 50%;
+            position: relative;
+        }
+
+            .radio-indicator span.active {
+                border-color: #ff6b8b;
+            }
+
+                .radio-indicator span.active::after {
+                    content: '';
+                    position: absolute;
+                    top: 2px;
+                    left: 2px;
+                    width: 8px;
+                    height: 8px;
+                    background: #ff6b8b;
+                    border-radius: 50%;
+                }
+
+    .btn-submit {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #ff6b8b 0%, #ff8e53 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+        .btn-submit:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 139, 0.3);
+        }
+
+    .settings-footer {
+        padding: 1rem 2rem;
+        background-color: #fff8f9;
+        border-top: 1px solid #f0f0f0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #666;
+    }
+
+        .settings-footer i {
+            color: #ff6b8b;
+        }
+
+    .validation-summary {
+        color: #dc3545;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        padding: 10px;
+        margin-bottom: 1.5rem;
+    }
+
+    @@media (max-width: 768px) {
+        .action-cards {
+            grid-template-columns: 1fr;
+        }
+
+        .settings-card {
+            border-radius: 0;
+        }
+
+        .account-settings-container {
+            padding: 0;
+        }
+    }
+</style>
+
+@code {
+    private bool result = false;
+    private string Message;
+
+    private SwitchOrDeleteDTO SwitchOrDeleteModel = new SwitchOrDeleteDTO();
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            string action = SwitchOrDeleteModel.SwitchOrDelete == 1 ? "switch off" : "delete";
+            bool isConfirmed = await JS.InvokeAsync<bool>(
+                "showConfirmation",
+                $"Are you sure you want to {action} your account?",
+                "This action cannot be undone",
+                SwitchOrDeleteModel.SwitchOrDelete == 1 ? "warning" : "error"
+            );
+
+            if (isConfirmed)
+            {
+                if (SwitchOrDeleteModel.SwitchOrDelete == 1)
+                {
+                    result = await _apiServiceLogin.SendSwitchedOffFromCurrentUser(SwitchOrDeleteModel);
+                    Message = "Your account has been temporarily deactivated. You can reactivate it anytime by logging in.";
+                }
+                else
+                {
+                    result = await _apiServiceLogin.SendDeleteAccountFromCurrentUser(SwitchOrDeleteModel);
+                    Message = "Your account has been permanently deleted. All your data has been removed from our systems.";
+                }
+
+                if (result)
+                {
+                    await localStorage.RemoveItemAsync("AYMauthToken");
+                    _AppState.CurrentUserHistoryDTO = null;
+                    _AppState.isAuthenticated = false;
+                    StateHasChanged();
+
+                    Navigation.NavigateTo($"/login?message={Uri.EscapeDataString(Message)}");
+                }
+                else
+                {
+                    await ShowAlert("An error occurred. Please try again or contact support if the problem persists.");
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            await ShowAlert("An unexpected error occurred. Please try again later.");
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialize with Switch Off as default
+        SwitchOrDeleteModel.SwitchOrDelete = 1;
+    }
+}
+
+}
+else
+    UnAuthorizedUser();

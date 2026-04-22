@@ -1,0 +1,418 @@
+﻿@* @page "/"
+@inherits Login
+
+
+<PageTitle>Index</PageTitle>
+
+    <h1>Welcome to AYMdating</h1>
+    <p>Your Gateway to Love and Marriage Worldwide!</p>
+
+    <p>
+        Are you ready to find your soulmate? Whether you're looking for love or a lifelong partner, AYMdating connects you with like-minded individuals from all over the world. Join our community today and start your journey toward finding that special someone!
+    </p>
+
+    <h3>Why Choose AYMdating?</h3>
+    <ul style="list-style-type:none">
+    <li><strong>Global Connections:</strong> Meet people from different cultures and backgrounds.</li>
+        <li><strong>Personalized Matches:</strong> Our advanced algorithms help you find the perfect match.</li>
+        <li><strong>Safe & Secure:</strong> Your privacy is our top priority.</li>
+        <li><strong>Exclusive Features:</strong> Enjoy premium features with our subscription plans.</li>
+    </ul>
+
+    <p>
+        Unlock the full potential of AYMdating with our affordable subscription plans. Whether you're looking for love or a meaningful relationship, our platform offers everything you need to connect with your ideal partner. Choose the package that suits you and start making meaningful connections today!
+    </p>
+
+    <p>Take the First Step Toward Your Happily Ever After!
+    <img src="css/Images/Default/online_dating_apps-4258776969.jpg" class="img-fluid" />
+    </p>
+
+<div class="text-center mb-2">
+</div>
+
+
+@code {
+
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        // if (firstRender)
+        // {
+        //     await IfUserOnline();
+        // }
+        // await IfUserOnline();
+
+        // StateHasChanged();
+    }
+} *@
+
+
+    @page "/"
+@inherits Login
+
+<PageTitle>Find Your Perfect Match - AYM Dating</PageTitle>
+
+<div class="homepage-hero">
+    <div class="hero-content">
+        <div class="hero-text">
+            <h1>Find Your Soulmate with AYM Dating</h1>
+            <p class="hero-subtitle">Your gateway to meaningful connections and lasting relationships</p>
+
+            <div class="hero-buttons">
+                <a href="/register" class="btn-primary">
+                    Join Free Today
+                    <i class="fas fa-heart ml-2"></i>
+                </a>
+                <a href="/login" class="btn-secondary">
+                    Sign In
+                    <i class="fas fa-user ml-2"></i>
+                </a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <img src="css/Images/Default/online_dating_apps-4258776969.jpg" alt="Happy couple" class="hero-img" />
+        </div>
+    </div>
+</div>
+
+<div class="features-section">
+    <div class="container">
+        <h2 class="section-title">Why Choose AYM Dating?</h2>
+        <p class="section-subtitle">We make finding love simple, safe, and enjoyable</p>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3>Global Connections</h3>
+                <p>Meet people from different cultures and backgrounds who share your values</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <h3>Smart Matching</h3>
+                <p>Our advanced algorithms help you find compatible partners</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-lock"></i>
+                </div>
+                <h3>Safe & Secure</h3>
+                <p>Verified profiles and privacy controls for your peace of mind</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-star"></i>
+                </div>
+                <h3>Premium Features</h3>
+                <p>Exclusive tools to enhance your dating experience</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="testimonials-section">
+    <div class="container">
+        <h2 class="section-title">Success Stories</h2>
+        <p class="section-subtitle">Real couples who found love through AYM Dating</p>
+
+        <div class="testimonials-slider">
+            <div class="testimonial-card">
+                <div class="testimonial-content">
+                    <img src="css/Images/Default/tmpFeaturedImagelifestyle_onlinedating-400-2934769785.jpg" alt="Happy couple" class="testimonial-img" />
+                    <div class="testimonial-text">
+                        <p>"After years of searching, I found my perfect match on AYM Dating. We're now happily married!"</p>
+                        <div class="testimonial-author">- Sarah & Michael</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="cta-section">
+    <div class="container">
+        <h2>Ready to Find Your Perfect Match?</h2>
+        <p>Join thousands of singles who've already found love through AYM Dating</p>
+        <a href="/register" class="btn-primary btn-lg">
+            Start Your Journey Today
+            <i class="fas fa-arrow-right ml-2"></i>
+        </a>
+    </div>
+</div>
+
+<style>
+    /* Hero Section */
+    .homepage-hero {
+        background: linear-gradient(135deg, #ff6b8b 0%, #ff8e53 100%);
+        color: white;
+        padding: 4rem 0;
+    }
+
+    .hero-content {
+        display: flex;
+        align-items: center;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .hero-text {
+        flex: 1;
+        padding-right: 2rem;
+    }
+
+    .hero-image {
+        flex: 1;
+    }
+
+    h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        line-height: 1.2;
+    }
+
+    .hero-subtitle {
+        font-size: 1.5rem;
+        margin-bottom: 2rem;
+        opacity: 0.9;
+    }
+
+    .hero-buttons {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    .btn-primary {
+        background: white;
+        color: #ff6b8b;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+    .btn-secondary {
+        background: transparent;
+        color: white;
+        border: 2px solid white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 50px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        transition: all 0.3s ease;
+    }
+
+        .btn-secondary:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+    .hero-img {
+        width: 100%;
+        border-radius: 10px;
+        box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+    }
+
+    /* Features Section */
+    .features-section {
+        padding: 5rem 0;
+        background: white;
+    }
+
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 2rem;
+    }
+
+    .section-title {
+        text-align: center;
+        font-size: 2.5rem;
+        color: #333;
+        margin-bottom: 1rem;
+    }
+
+    .section-subtitle {
+        text-align: center;
+        color: #666;
+        font-size: 1.2rem;
+        margin-bottom: 3rem;
+    }
+
+    .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 2rem;
+        margin-top: 3rem;
+    }
+
+    .feature-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+        transition: all 0.3s ease;
+    }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+    .feature-icon {
+        width: 70px;
+        height: 70px;
+        background: linear-gradient(135deg, #ff6b8b 0%, #ff8e53 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .feature-card h3 {
+        color: #333;
+        margin-bottom: 1rem;
+    }
+
+    .feature-card p {
+        color: #666;
+        line-height: 1.6;
+    }
+
+    /* Testimonials */
+    .testimonials-section {
+        padding: 5rem 0;
+        background: #f9f9f9;
+    }
+
+    .testimonials-slider {
+        margin-top: 3rem;
+    }
+
+    .testimonial-card {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    }
+
+    .testimonial-content {
+        display: flex;
+    }
+
+    .testimonial-img {
+        width: 200px;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .testimonial-text {
+        padding: 2rem;
+        flex: 1;
+    }
+
+        .testimonial-text p {
+            font-size: 1.1rem;
+            font-style: italic;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+    .testimonial-author {
+        font-weight: 600;
+        color: #ff6b8b;
+    }
+
+    /* CTA Section */
+    .cta-section {
+        padding: 5rem 0;
+        text-align: center;
+        background: linear-gradient(135deg, #ff6b8b 0%, #ff8e53 100%);
+        color: white;
+    }
+
+        .cta-section h2 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-section p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+
+    .btn-lg {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+
+    /* Responsive */
+    @@media (max-width: 768px) {
+        .hero-content {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .hero-text {
+            padding-right: 0;
+            margin-bottom: 2rem;
+        }
+
+        .hero-buttons {
+            justify-content: center;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+        }
+
+        .testimonial-content {
+            flex-direction: column;
+        }
+
+        .testimonial-img {
+            width: 100%;
+            height: 200px;
+        }
+    }
+</style>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialization code if needed
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Any after-render logic
+    }
+}

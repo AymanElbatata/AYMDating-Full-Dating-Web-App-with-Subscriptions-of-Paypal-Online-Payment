@@ -1,0 +1,423 @@
+﻿@page "/contactUs"
+
+@inherits Login
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using AYMDating.DAL.Entities
+@using System.Net.Http.Headers
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+
+@* <PageTitle>Contact Us</PageTitle>
+
+    <div class="container d-flex flex-column align-items-center justify-content-center">
+        <EditForm Model="contactusModel" OnValidSubmit="Handlecontact">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
+            <div class="text-center mb-1">
+                <label for="Email">Name:</label>
+                <InputText id="contactusModel.Name" @bind-Value="contactusModel.Name" type="text" />
+            </div>
+            <div class="text-center mb-1">
+                <label for="Code">Email:</label>
+                <InputText id="contactusModel.Email" @bind-Value="contactusModel.Email" type="email" />
+            </div>
+            <div class="text-center mb-1">
+                <label for="Code">Message:</label>
+                <InputTextArea id="contactusModel.Message" @bind-Value="contactusModel.Message" class="textarea-custom" maxlength="600" type="text" />
+            </div>
+            <div class="text-center mb-1">
+                <button class="btn btn-outline-dark" type="submit">Send Message</button>
+            </div>
+        </EditForm>
+    </div> *@
+
+
+<PageTitle>Contact Us - AYM Dating</PageTitle>
+
+<div class="contact-container">
+    <div class="contact-card">
+        <div class="contact-header">
+            <h2>Get In Touch</h2>
+            <p>We'd love to hear from you! Send us a message and we'll respond as soon as possible.</p>
+        </div>
+
+        <EditForm Model="contactusModel" OnValidSubmit="Handlecontact">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="validation-summary" />
+
+            <div class="form-group">
+                <div class="input-with-icon">
+                    <i class="fas fa-user"></i>
+                    <InputText @bind-Value="contactusModel.Name" class="form-control" placeholder="Your Name" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-with-icon">
+                    <i class="fas fa-envelope"></i>
+                    <InputText @bind-Value="contactusModel.Email" type="email" class="form-control" placeholder="Your Email" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="input-with-icon">
+                    <i class="fas fa-comment"></i>
+                    <InputTextArea @bind-Value="contactusModel.Message" class="form-control textarea-custom"
+                                   placeholder="Your Message (max 600 characters)" maxlength="600" />
+                </div>
+                <div class="char-counter">@(contactusModel.Message?.Length ?? 0)/600</div>
+            </div>
+            @if (!_isHuman)
+            {
+                <div class="captcha-box">
+                    <p>Please verify you're not a robot</p>
+                    <div class="captcha-challenge">
+                        <span>@_num1 + @_num2 = ?</span>
+                        <div class="captcha-input">
+                            <input @bind="_userAnswer" placeholder="Your answer" type="text" />
+                            <button type="button" class="btn-verify" @onclick="VerifyCaptcha">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="verification-success">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Verification complete!</span>
+                </div>
+            }
+            <button class="submit-btn" type="submit" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <span class="spinner"></span>
+                    <span>Sending...</span>
+                }
+                else
+                {
+                    <span>Send Message</span>
+                    <i class="fas fa-paper-plane"></i>
+                }
+            </button>
+        </EditForm>
+
+        <div class="contact-info">
+            <div class="info-item">
+                <i class="fas fa-envelope"></i>
+                <span>ayman_elbatata@inbox.lt</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-phone"></i>
+                <span>+2 (012) 848-78483</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>10th District, Cairo City</span>
+            </div>
+            <div class="info-item">
+                <i class="fas fa-qrcode"></i>
+                <span> <img src="css/Images/Default/QRAYMLINKEDIN2025.png" alt="Logo" class="w-25 h-25"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .contact-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 80vh;
+        padding: 2rem;
+        background: linear-gradient(135deg, rgba(255,107,139,0.05) 0%, rgba(255,142,83,0.05) 100%);
+    }
+
+    .contact-card {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+        width: 100%;
+        max-width: 600px;
+        padding: 2.5rem;
+    }
+
+    .contact-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+        .contact-header h2 {
+            color: #ff6b8b;
+            margin-bottom: 0.5rem;
+        }
+
+        .contact-header p {
+            color: #666;
+            margin: 0;
+        }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .input-with-icon {
+        position: relative;
+    }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            color: #999;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: #ff6b8b;
+            box-shadow: 0 0 0 3px rgba(255,107,139,0.2);
+            outline: none;
+        }
+
+    .textarea-custom {
+        min-height: 150px;
+        resize: vertical;
+        padding-top: 12px;
+    }
+
+    .char-counter {
+        text-align: right;
+        font-size: 0.8rem;
+        color: #999;
+        margin-top: 0.25rem;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #ff6b8b 0%, #ff8e53 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+        .submit-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 139, 0.3);
+        }
+
+        .submit-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+    .spinner {
+        width: 18px;
+        height: 18px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .contact-info {
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #f0f0f0;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        margin-bottom: 1rem;
+        color: #555;
+    }
+
+        .info-item i {
+            color: #ff6b8b;
+            width: 20px;
+            text-align: center;
+        }
+
+    .validation-summary {
+        color: #ff4757;
+        background-color: #ffebee;
+        border-left: 4px solid #ff4757;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+    }
+
+    @@media (max-width: 768px) {
+        .contact-container {
+            padding: 1rem;
+        }
+
+        .contact-card {
+            padding: 1.5rem;
+        }
+    }
+
+    .captcha-box {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: var(--light-gray);
+        border-radius: 6px;
+        text-align: center;
+    }
+
+        .captcha-box p {
+            margin: 0 0 1rem;
+            color: #666;
+        }
+
+    .captcha-challenge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+        .captcha-challenge span {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+    .captcha-input {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+        .captcha-input input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            width: 80px;
+            text-align: center;
+        }
+
+    .btn-verify {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .verification-success {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: var(--success-color);
+        margin: 1.5rem 0;
+    }
+</style>
+
+@if (isLoading)
+{
+    <div class="container d-flex flex-column align-items-center justify-content-center">
+        <div class="loader text-center">
+            <div class="loader-text"> <img src="css/Images/Default/reload-loading-process-blue-round-512-3569811198.png" class="img-fluid" style="max-width: 80%;" /> </div>
+        </div>
+
+    </div>
+}
+@code {
+
+    protected bool isLoading = false;
+
+    private int _num1;
+    private int _num2;
+    private string _userAnswer;
+    private bool _isHuman;
+
+    private ContactUsDTO contactusModel = new ContactUsDTO();
+
+    protected override void OnInitialized()
+    {
+        GenerateCaptcha();
+    }
+    private void VerifyCaptcha()
+    {
+        int correctAnswer = _num1 + _num2;
+        _isHuman = _userAnswer == correctAnswer.ToString();
+    }
+    private void GenerateCaptcha()
+    {
+        var random = new Random();
+        _num1 = random.Next(1, 10);
+        _num2 = random.Next(1, 10);
+    }
+    private async Task Handlecontact()
+    {
+        try
+        {
+            if (_isHuman)
+{
+                 isLoading = true;
+            bool ActivateUserIsDone = await _apiServiceLogin.SendMessageContactUsFromAnonymous(contactusModel);
+            if (ActivateUserIsDone)
+            {
+                contactusModel = new ContactUsDTO();
+                StateHasChanged();
+                await ShowAlert("Thanks, Your Message has been sent!.");
+            }
+                isLoading = false;
+            }
+            else
+                await ShowAlert("Wrong Captcha");
+        }
+        catch (Exception ex)
+        {
+            // Handle login failure (e.g., show an error message)
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        // if (firstRender)
+        // {
+        // }
+    }
+}

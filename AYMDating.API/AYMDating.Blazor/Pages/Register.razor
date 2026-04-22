@@ -1,0 +1,439 @@
+﻿@page "/register"
+@inherits Login
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using AYMDating.DAL.Entities
+@using Blazored.LocalStorage
+@using System.Net.Http.Headers
+@using System.ComponentModel.DataAnnotations
+@inject ILocalStorageService localStorage
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AppState _AppState
+
+@* <PageTitle>Register</PageTitle>
+
+<div class="container text-center d-flex align-content-center justify-content-center">
+    <EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="text-center mb-1">
+            <label for="registerModel.Email">Email:</label>
+            <InputText id="registerModel.Email" @bind-Value="registerModel.Email" type="email" />
+     </div>
+        <div class="text-center mb-1">
+            <label for="registerModel.Password">Password:</label>
+            <InputText id="registerModel.Password" @bind-Value="registerModel.Password" type="password" />
+     </div>
+        <div class="text-center mb-1">
+            <label for="registerModel.ConfirmPassword">ConfirmPassword:</label>
+            <InputText id="registerModel.ConfirmPassword" @bind-Value="registerModel.ConfirmPassword" type="password" />
+    </div>
+        <div class="text-center mb-1">
+            <label for="registerModel.PhoneNumber">PhoneNumber:</label>
+            <InputText id="registerModel.PhoneNumber" @bind-Value="registerModel.PhoneNumber" type="text" />
+     </div>
+        <div class="text-center mb-1">
+            <label for="registerModel.DateOfBirth">DateOfBirth:</label>
+            <InputDate id="registerModel.DateOfBirth" @bind-Value="registerModel.DateOfBirth" class="form-control" />
+     </div>
+        <div class="text-center mb-1">
+            <label for="registerModel.Gender">Gender:</label>
+            <InputSelect id="registerModel.Gender" @bind-Value="registerModel.Gender">
+                @foreach (var item in Genders)
+                {
+                    <option value="@item.ID">@item.Name</option>
+                }
+            </InputSelect>
+        </div>
+            <div class="text-center mb-1">
+            <button class="btn btn-outline-dark" type="submit">Register</button>
+        </div>
+</EditForm>
+</div> *@
+
+
+<PageTitle>Join AYM Dating</PageTitle>
+
+<div class="register-container">
+    <div class="register-card">
+        <div class="register-header">
+            <h2>Create Your Account</h2>
+            <p>Begin your journey to find love</p>
+        </div>
+
+        <EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="validation-summary" />
+
+            <div class="form-group">
+                <label>Email</label>
+                <InputText @bind-Value="registerModel.Email" class="form-control" placeholder="Your email address" />
+            </div>
+
+            <div class="form-group">
+                <label>Password</label>
+                <div class="password-input">
+                    <InputText id="Password" @bind-Value="registerModel.Password"
+                               type="@(showPassword ? "text" : "password")"
+                               class="form-control"
+                               placeholder="Create your password" />
+                               <button type="button" class="toggle-password" @onclick="TogglePasswordVisibility">
+                        <i class="fas @(showPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Confirm Password</label>
+                <InputText @bind-Value="registerModel.ConfirmPassword" type="password"
+                           class="form-control" placeholder="Confirm your password" />
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <InputText @bind-Value="registerModel.PhoneNumber" class="form-control"
+                               placeholder="Your phone number" />
+                </div>
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <InputDate @bind-Value="registerModel.DateOfBirth" class="form-control" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>I'm</label>
+                <InputSelect @bind-Value="registerModel.Gender" class="form-control">
+                    @foreach (var item in Genders)
+                    {
+                        <option value="@item.ID">@item.Name</option>
+                    }
+                </InputSelect>
+            </div>
+            @if (!_isHuman)
+            {
+                <div class="captcha-box">
+                    <p>Please verify you're not a robot</p>
+                    <div class="captcha-challenge">
+                        <span>@_num1 + @_num2 = ?</span>
+                        <div class="captcha-input">
+                            <input @bind="_userAnswer" placeholder="Your answer" type="text" />
+                            <button type="button" class="btn-verify" @onclick="VerifyCaptcha">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="verification-success">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Verification complete!</span>
+                </div>
+            }
+            <button type="submit" class="register-btn" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <span class="spinner"></span>
+                }
+                Create Account
+            </button>
+
+            <div class="login-link">
+                Already have an account? <a href="/login">Sign in</a>
+            </div>
+        </EditForm>
+
+    </div>
+</div>
+
+<style>
+    .register-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: #f8f9fa;
+        padding: 2rem;
+    }
+
+    .register-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 500px;
+        padding: 30px;
+    }
+
+    .register-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+        .register-header h2 {
+            color: #ff6b8b;
+            margin-bottom: 5px;
+        }
+
+        .register-header p {
+            color: #6c757d;
+            margin: 0;
+        }
+
+    .form-group {
+        margin-bottom: 20px;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: #495057;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ced4da;
+        border-radius: 6px;
+        font-size: 16px;
+        transition: border-color 0.3s;
+    }
+
+        .form-control:focus {
+            border-color: #ff6b8b;
+            outline: none;
+        }
+
+    .password-input {
+        position: relative;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+    }
+
+    .form-row {
+        display: flex;
+        gap: 15px;
+    }
+
+        .form-row .form-group {
+            flex: 1;
+        }
+
+    .register-btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(to right, #ff6b8b, #ff8e53);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        margin-top: 10px;
+    }
+
+        .register-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+
+        .register-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+    .spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+        margin-right: 10px;
+    }
+
+    @@keyframes spin {
+        to {
+            transform: rotate(360deg);
+        }
+    }
+
+    .login-link {
+        text-align: center;
+        margin-top: 20px;
+        color: #6c757d;
+    }
+
+        .login-link a {
+            color: #ff6b8b;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+    .validation-summary {
+        color: #dc3545;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: 4px;
+        padding: 10px;
+        margin-bottom: 20px;
+    }
+
+    @@media (max-width: 576px) {
+        .form-row {
+            flex-direction: column;
+            gap: 0;
+        }
+
+        .register-card {
+            padding: 20px;
+        }
+    }
+
+    .captcha-box {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: var(--light-gray);
+        border-radius: 6px;
+        text-align: center;
+    }
+
+        .captcha-box p {
+            margin: 0 0 1rem;
+            color: #666;
+        }
+
+    .captcha-challenge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+        .captcha-challenge span {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+    .captcha-input {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+        .captcha-input input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            width: 80px;
+            text-align: center;
+        }
+
+    .btn-verify {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .verification-success {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: var(--success-color);
+        margin: 1.5rem 0;
+    }
+</style>
+
+
+@code {
+    private List<Gender> Genders = new List<Gender>() { new Gender() { ID = 1, Name = "Male" }, new Gender() { ID = 2, Name = "Female" } };
+    private RegisterDTO registerModel = new RegisterDTO();
+    private bool showPassword = false;
+
+    private int _num1;
+    private int _num2;
+    private string _userAnswer;
+    private bool _isHuman;
+
+
+    private void TogglePasswordVisibility()
+    {
+        showPassword = !showPassword;
+    }
+    protected override void OnInitialized()
+    {
+        GenerateCaptcha();
+    }
+    private void GenerateCaptcha()
+    {
+        var random = new Random();
+        _num1 = random.Next(1, 10);
+        _num2 = random.Next(1, 10);
+    }
+
+    private void VerifyCaptcha()
+    {
+        int correctAnswer = _num1 + _num2;
+        _isHuman = _userAnswer == correctAnswer.ToString();
+    }
+    private async Task HandleRegister()
+    {
+        try
+        {
+            if (_isHuman)
+            {
+                isLoading = true;
+                ActivateUserDTO CreatedUser = await _apiServiceLogin.RegisterProcessAsync(registerModel);
+                if (CreatedUser.Email != null)
+                {
+                    Navigation.NavigateTo($"/activateAccount/{CreatedUser.Email}");
+                }
+                isLoading = false;
+                await ShowAlert("Server Error!");
+            }
+            else
+                await ShowAlert("Wrong Captcha");
+
+        }
+        catch (Exception ex)
+        {
+            // Handle login failure (e.g., show an error message)
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        registerModel.DateOfBirth = new DateTime(1970,01,25) ;
+    }
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        
+    }
+
+}

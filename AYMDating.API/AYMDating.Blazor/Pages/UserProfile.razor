@@ -1,0 +1,810 @@
+﻿@page "/userProfile"
+@if (_AppState.isAuthenticated)
+{
+@inherits Users
+
+@using AYMDating.API.Helpers
+@using Microsoft.AspNetCore.Components.Forms
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using AYMDating.DAL.Entities
+@using System.Drawing
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+@inject AppState _AppState
+
+@* <PageTitle>Profile</PageTitle>
+
+<style>
+
+
+    input[type="file"].d-none {
+        display: none;
+    }
+
+    .custom-file-upload {
+        cursor: pointer;
+        display: inline-block;
+    }
+
+    .custom-file-upload:hover {
+         background-color: gray; /* Optional: Change background on hover */
+    }
+
+    .textarea-custom {
+        width: 100%;
+        height: 200px; /* Adjust height as needed */
+    }
+</style>
+@if (_AppState.isAuthenticated)
+{
+<div class="m-auto text-center">
+    <h4>Profile</h4>
+    <br />
+</div>
+
+    @if (userHistory == null || Countries == null || Jobs == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{    <div class="container">
+        <div class="row">
+            <div class="col-md-5 text-cener rounded p-1 mb-3">
+                    <div class="d-flex row p-1">
+                        <label class="custom-file-upload btn btn-outline-secondary m-1">
+                        <InputFile class="d-none" OnChange="HandleSelected" MaxFileSize="307200" />
+                        <img src="@GetUserImage(userHistory.MainImage)" alt="Image" class="img-fluid photo-box rounded" />
+                    </label>
+                    <button class="btn btn-outline-secondary" @onclick="() => UploadFile(5)">Upload</button>
+                </div>
+                <div class="d-flex row p-1">
+                    <div class="col-md-3 rounded d-flex align-items-center flex-column">
+                        <label class="custom-file-upload btn btn-outline-secondary photo-box2">
+                            <InputFile class="d-none" OnChange="HandleSelected" MaxFileSize="307200" />
+                            <img src="@GetUserImageOrdered(1)" title="@userHistory.AppUser.UserName- 1" class="img-fluid rounded" />
+                        </label>
+                        <button class="btn btn-outline-secondary mt-1" @onclick="() => UploadFile(1)">Upload</button>
+                    </div>
+                    <div class="col-md-3 rounded d-flex align-items-center flex-column">
+                        <label class="custom-file-upload btn btn-outline-secondary photo-box2">
+                            <InputFile class="d-none" OnChange="HandleSelected" MaxFileSize="307200" />
+                            <img src="@GetUserImageOrdered(2)" title="@userHistory.AppUser.UserName- 2" class="img-fluid rounded"  />
+                        </label>
+                        <button class="btn btn-outline-secondary mt-1" @onclick="() => UploadFile(2)">Upload</button>
+                    </div>
+                    <div class="col-md-3 rounded d-flex align-items-center flex-column">
+                        <label class="custom-file-upload btn btn-outline-secondary photo-box2">
+                            <InputFile class="d-none" OnChange="HandleSelected" MaxFileSize="307200" />
+                            <img src="@GetUserImageOrdered(3)" title="@userHistory.AppUser.UserName- 3" class="img-fluid rounded"  />
+                        </label>
+                        <button class="btn btn-outline-secondary mt-1" @onclick="() => UploadFile(3)">Upload</button>
+                    </div>
+                    <div class="col-md-3 rounded d-flex align-items-center flex-column">
+                        <label class="custom-file-upload btn btn-outline-secondary photo-box2">
+                            <InputFile class="d-none" OnChange="HandleSelected" MaxFileSize="307200" />
+                            <img src="@GetUserImageOrdered(4)" title="@userHistory.AppUser.UserName- 4" class="img-fluid rounded" />
+                        </label>
+                        <button class="btn btn-outline-secondary mt-1" @onclick="() => UploadFile(4)">Upload</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-7 text-center rounded px-4 mb-3">
+                <div class="d-flex align-items-center">
+                        <EditForm Model="userHistory" OnValidSubmit="HandleuserHistoryUpdate" class="m-auto w-100">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+                        <div class="form-control">
+                                <img src="@GetpackageImage((int)userHistory.UserPackage.PackageId)" title="@userHistory.UserPackage.Package.Name" class="img-fluid" style="max-width: 10%;" /> @(userHistory.UserPackage.PackageId != 1 ? $" Until: {userHistory.UserPackage.PackageEndDate.Day}/{userHistory.UserPackage.PackageEndDate.Month}/{userHistory.UserPackage.PackageEndDate.Year}" : "")
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.AgeTo">Profile Heading:</label>
+                                <InputText id="userHistory.ProfileHeading" @bind-Value="userHistory.ProfileHeading" maxlength="75" class="w-75" />
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.SearchAgeFrom">Age From:</label>
+                                <InputNumber id="userHistory.AgeFrom" @bind-Value="userHistory.SearchAgeFrom" class="w-75" />
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.SearchAgeTo">Age To:</label>
+                                <InputNumber id="userHistory.AgeTo" @bind-Value="userHistory.SearchAgeTo" class="w-75" />
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.CountryId">Country:</label>
+                            <InputSelect id="userHistory.CountryId" @bind-Value="userHistory.CountryId" class="w-75" >
+                                @foreach (var item in Countries)
+                                {
+                                    <option value="@item.ID">@item.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.City">City:</label>
+                                <InputText id="userHistory.City" @bind-Value="userHistory.City" class="w-75" />
+                        </div>
+                        <div class="form-control">
+                            <label for="countryDropdown">Gender:</label>
+                                <InputSelect id="countryDropdown" @bind-Value="userHistory.GenderId" class="w-75">
+                                @foreach (var item in Genders)
+                                {
+                                    <option value="@item.ID">@item.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.MaritalStatusId">Marital Status:</label>
+                                <InputSelect id="userHistory.MaritalStatusId" @bind-Value="userHistory.MaritalStatusId" class="w-75">
+                                @foreach (var item in MaritalStatuses)
+                                {
+                                    <option value="@item.ID">@item.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.LanguageId">Language:</label>
+                                <InputSelect id="userHistory.LanguageId" @bind-Value="userHistory.LanguageId" class="w-75">
+                                @foreach (var item in Languages)
+                                {
+                                    <option value="@item.ID">@item.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.EducationId">Education:</label>
+                                <InputSelect id="userHistory.EducationId" @bind-Value="userHistory.EducationId" class="w-75">
+                                @foreach (var item in Educations)
+                                {
+                                    <option value="@item.ID">@item.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.JobId">Job:</label>
+                                <InputSelect id="userHistory.JobId" @bind-Value="userHistory.JobId" class="w-75">
+                                @foreach (var item in Jobs)
+                                {
+                                    <option value="@item.ID">@item.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.PurposeId">Purpose:</label>
+                                <InputSelect id="userHistory.PurposeId" @bind-Value="userHistory.PurposeId" class="w-75">
+                                @foreach (var item in Purposes)
+                                {
+                                    <option value="@item.ID">@item.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.FinancialModeId">Financial Mode:</label>
+                                <InputSelect id="userHistory.FinancialModeId" @bind-Value="userHistory.FinancialModeId" class="w-75">
+                                @foreach (var item in FinancialModes)
+                                {
+                                    <option value="@item.ID">@item.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.AboutYou">About You:</label>
+                            <InputTextArea id="userHistory.AboutYou" @bind-Value="userHistory.AboutYou" class="textarea-custom" maxlength="900" />
+                        </div>
+                        <div class="form-control">
+                            <label for="userHistory.AboutPartner">About Partner:</label>
+                            <InputTextArea id="userHistory.AboutPartner" @bind-Value="userHistory.AboutPartner" class="textarea-custom" maxlength="900" />
+                        </div>
+                        <br />
+                        <button class="btn btn-outline-secondary rounded mb-3" type="submit">Save</button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+
+      </div>
+ }
+}
+else
+    UnAuthorizedUser(); *@
+
+
+
+<PageTitle>Profile</PageTitle>
+
+<style>
+    :root {
+        --primary-color: #6c5ce7;
+        --secondary-color: #a29bfe;
+        --accent-color: #fd79a8;
+        --light-color: #f8f9fa;
+        --dark-color: #343a40;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    .profile-container {
+        max-width: 1200px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+
+    .profile-header {
+        text-align: center;
+        margin-bottom: 2rem;
+        color: var(--primary-color);
+    }
+
+    .photo-section {
+        background-color: var(--light-color);
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1.5rem;
+    }
+
+    .main-photo-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .photo-box {
+        width: 200px;
+        height: 200px;
+        object-fit: cover;
+        border: 3px solid white;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+    }
+
+        .photo-box:hover {
+            transform: scale(1.03);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+    .photo-box2 {
+        width: 120px;
+        height: 120px;
+        object-fit: cover;
+        border: 2px solid white;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+    }
+
+        .photo-box2:hover {
+            transform: scale(1.05);
+        }
+
+    .photo-upload-btn {
+        margin-top: 0.5rem;
+        background-color: var(--secondary-color);
+        color: white;
+        border: none;
+        transition: var(--transition);
+    }
+
+        .photo-upload-btn:hover {
+            background-color: var(--primary-color);
+        }
+
+    .form-section {
+        background-color: var(--light-color);
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+    }
+
+    .form-control {
+        margin-bottom: 1rem;
+    }
+
+        .form-control label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-control input,
+        .form-control select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ced4da;
+            border-radius: var(--border-radius);
+            transition: var(--transition);
+        }
+
+            .form-control input:focus,
+            .form-control select:focus {
+                border-color: var(--primary-color);
+                outline: none;
+                box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.25);
+            }
+
+    .textarea-custom {
+        width: 100%;
+        height: 150px;
+        padding: 0.75rem;
+        border: 1px solid #ced4da;
+        border-radius: var(--border-radius);
+        resize: vertical;
+        transition: var(--transition);
+    }
+
+        .textarea-custom:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.25);
+        }
+
+    .save-btn {
+        background-color: var(--primary-color);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: var(--border-radius);
+        font-weight: 500;
+        transition: var(--transition);
+        width: 100%;
+    }
+
+        .save-btn:hover {
+            background-color: #5649d2;
+            transform: translateY(-2px);
+        }
+
+    .package-badge {
+        display: inline-flex;
+        align-items: center;
+        background-color: var(--accent-color);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        margin-bottom: 1rem;
+    }
+
+        .package-badge img {
+            margin-right: 0.5rem;
+        }
+
+    input[type="file"].d-none {
+        display: none;
+    }
+
+    .custom-file-upload {
+        cursor: pointer;
+        display: inline-block;
+        transition: var(--transition);
+    }
+
+        .custom-file-upload:hover {
+            opacity: 0.8;
+        }
+
+    .loading-text {
+        text-align: center;
+        padding: 2rem;
+        color: var(--primary-color);
+    }
+
+    @@media (max-width: 768px) {
+        .profile-container {
+            padding: 1rem;
+        }
+
+        .photo-box {
+            width: 150px;
+            height: 150px;
+        }
+
+        .photo-box2 {
+            width: 80px;
+            height: 80px;
+        }
+    }
+</style>
+
+@if (_AppState.isAuthenticated)
+{
+    <div class="profile-container">
+        <div class="profile-header">
+            <h3>My Profile</h3>
+            <p class="text-muted">Manage your profile information and preferences</p>
+        </div>
+
+        @if (userHistory == null || Countries == null || Jobs == null)
+        {
+            <div class="loading-text">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                </div>
+                <p class="mt-2">Loading your profile...</p>
+            </div>
+        }
+        else
+        {
+            <div class="row">
+                <!-- Photo Section -->
+                <div class="col-md-5">
+                    <div class="photo-section">
+                        <!-- Main Photo -->
+                        <div class="main-photo-container text-center">
+                            <label class="custom-file-upload">
+                                <InputFile class="d-none" OnChange="HandleSelected" MaxFileSize="307200" />
+                                <img src="@GetUserImage(userHistory.MainImage)" alt="Profile Photo" class="photo-box rounded-circle" />
+                            </label>
+                            <button class="btn photo-upload-btn" @onclick="() => UploadFile(5)">
+                                <i class="fas fa-camera me-2"></i>Update Main Photo
+                            </button>
+                        </div>
+                        <!-- Other Photos -->
+                        <div class="d-flex row mt-4 align-items-center flex-column m-auto">
+
+                            <div class="col-md-6 mb-3 rounded text-center">
+                                <label class="custom-file-upload">
+                                    <InputFile class="d-none" OnChange="HandleSelected" MaxFileSize="307200" />
+                                    <img src="@GetUserImageOrdered(1)" title="@userHistory.AppUser.UserName- 1" class="photo-box2 rounded" />
+                                </label>
+                                <button class="btn photo-upload-btn btn-sm" @onclick="() => UploadFile(1)">Update</button>
+                            </div>
+
+                            <div class="col-md-6 mb-3 rounded text-center">
+                                <label class="custom-file-upload">
+                                    <InputFile class="d-none" OnChange="HandleSelected" MaxFileSize="307200" />
+                                    <img src="@GetUserImageOrdered(2)" title="@userHistory.AppUser.UserName- 2" class="photo-box2 rounded" />
+                                </label>
+                                <button class="btn photo-upload-btn btn-sm" @onclick="() => UploadFile(2)">Update</button>
+                            </div>
+                            <div class="col-md-6 mb-3 rounded text-center">
+                                <label class="custom-file-upload">
+                                    <InputFile class="d-none" OnChange="HandleSelected" MaxFileSize="307200" />
+                                    <img src="@GetUserImageOrdered(3)" title="@userHistory.AppUser.UserName- 3" class="photo-box2 rounded" />
+                                </label>
+                                <button class="btn photo-upload-btn btn-sm" @onclick="() => UploadFile(3)">Update</button>
+                            </div>
+                            <div class="col-md-6 mb-3 rounded text-center">
+                                <label class="custom-file-upload">
+                                    <InputFile class="d-none" OnChange="HandleSelected" MaxFileSize="307200" />
+                                    <img src="@GetUserImageOrdered(4)" title="@userHistory.AppUser.UserName- 4" class="photo-box2 rounded" />
+                                </label>
+                                <button class="btn photo-upload-btn btn-sm" @onclick="() => UploadFile(4)">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Section -->
+                <div class="col-md-7">
+                    <div class="form-section">
+                        <EditForm Model="userHistory" OnValidSubmit="HandleuserHistoryUpdate">
+                            <DataAnnotationsValidator />
+                            <ValidationSummary class="alert alert-danger" />
+
+                            <div class="package-badge">
+                                <div class="form-control">
+                                    <img src="@GetpackageImage((int)userHistory.UserPackage.PackageId)" title="@userHistory.UserPackage.Package.Name" class="img-fluid" style="max-width: 10%;" /> @(userHistory.UserPackage.PackageId != 1 ? $" Until: {userHistory.UserPackage.PackageEndDate.Day}/{userHistory.UserPackage.PackageEndDate.Month}/{userHistory.UserPackage.PackageEndDate.Year}" : "")
+                                </div>
+@*                                 <img src="@GetpackageImage((int)userHistory.UserPackage.PackageId)" title="@userHistory.UserPackage.Package.Name" />
+                                @(userHistory.UserPackage.PackageId != 1 ? $"Active until: {userHistory.UserPackage.PackageEndDate:dd/MM/yyyy}" : "Basic Membership")
+ *@                            </div>
+
+                            <div class="form-control">
+                                <label for="userHistory.ProfileHeading">Profile Heading</label>
+                                <InputText id="userHistory.ProfileHeading" @bind-Value="userHistory.ProfileHeading" maxlength="75"
+                                           placeholder="Your catchy profile headline" />
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-control">
+                                        <label for="userHistory.SearchAgeFrom">Minimum Age</label>
+                                        <InputNumber id="userHistory.AgeFrom" @bind-Value="userHistory.SearchAgeFrom"
+                                                     class="form-control" min="18" max="100" />
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-control">
+                                        <label for="userHistory.SearchAgeTo">Maximum Age</label>
+                                        <InputNumber id="userHistory.AgeTo" @bind-Value="userHistory.SearchAgeTo"
+                                                     class="form-control" min="18" max="100" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-control">
+                                        <label for="userHistory.CountryId">Country</label>
+                                        <InputSelect id="userHistory.CountryId" @bind-Value="userHistory.CountryId" class="form-control">
+                                            @foreach (var item in Countries)
+                                            {
+                                                <option value="@item.ID">@item.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-control">
+                                        <label for="userHistory.City">City</label>
+                                        <InputText id="userHistory.City" @bind-Value="userHistory.City"
+                                                   placeholder="Your city" />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-control">
+                                        <label for="countryDropdown">Gender</label>
+                                        <InputSelect id="countryDropdown" @bind-Value="userHistory.GenderId" class="form-control">
+                                            @foreach (var item in Genders)
+                                            {
+                                                <option value="@item.ID">@item.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-control">
+                                        <label for="userHistory.MaritalStatusId">Marital Status</label>
+                                        <InputSelect id="userHistory.MaritalStatusId" @bind-Value="userHistory.MaritalStatusId" class="form-control">
+                                            @foreach (var item in MaritalStatuses)
+                                            {
+                                                <option value="@item.ID">@item.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-control">
+                                        <label for="userHistory.LanguageId">Language</label>
+                                        <InputSelect id="userHistory.LanguageId" @bind-Value="userHistory.LanguageId" class="form-control">
+                                            @foreach (var item in Languages)
+                                            {
+                                                <option value="@item.ID">@item.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-control">
+                                        <label for="userHistory.EducationId">Education</label>
+                                        <InputSelect id="userHistory.EducationId" @bind-Value="userHistory.EducationId" class="form-control">
+                                            @foreach (var item in Educations)
+                                            {
+                                                <option value="@item.ID">@item.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="form-control">
+                                        <label for="userHistory.JobId">Occupation</label>
+                                        <InputSelect id="userHistory.JobId" @bind-Value="userHistory.JobId" class="form-control">
+                                            @foreach (var item in Jobs)
+                                            {
+                                                <option value="@item.ID">@item.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-control">
+                                        <label for="userHistory.PurposeId">Purpose</label>
+                                        <InputSelect id="userHistory.PurposeId" @bind-Value="userHistory.PurposeId" class="form-control">
+                                            @foreach (var item in Purposes)
+                                            {
+                                                <option value="@item.ID">@item.Name</option>
+                                            }
+                                        </InputSelect>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="form-control">
+                                <label for="userHistory.FinancialModeId">Financial Mode</label>
+                                <InputSelect id="userHistory.FinancialModeId" @bind-Value="userHistory.FinancialModeId" class="form-control">
+                                    @foreach (var item in FinancialModes)
+                                    {
+                                        <option value="@item.ID">@item.Name</option>
+                                    }
+                                </InputSelect>
+                            </div>
+
+                            <div class="form-control">
+                                <label for="userHistory.AboutYou">About You</label>
+                                <InputTextArea id="userHistory.AboutYou" @bind-Value="userHistory.AboutYou" class="textarea-custom"
+                                               maxlength="900" placeholder="Tell others about yourself..." />
+                                <small class="text-muted">@(userHistory?.AboutYou?.Length ?? 0)/900 characters</small>
+                            </div>
+
+                            <div class="form-control">
+                                <label for="userHistory.AboutPartner">About Your Ideal Partner</label>
+                                <InputTextArea id="userHistory.AboutPartner" @bind-Value="userHistory.AboutPartner" class="textarea-custom"
+                                               maxlength="900" placeholder="Describe your ideal partner..." />
+                                <small class="text-muted">@(userHistory?.AboutPartner?.Length ?? 0)/900 characters</small>
+                            </div>
+
+                            <button class="save-btn" type="submit">
+                                <i class="fas fa-save me-2"></i>Save Profile
+                            </button>
+                        </EditForm>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+else
+{
+    UnAuthorizedUser();
+}
+
+
+
+@code {
+
+    long maxFileSize = 300 * 1024; // 300 KB in bytes
+
+    protected string GetUserImageOrdered(int order)
+    {
+        var Image = userHistory.OtherImages.Where(a => a.Order == order).FirstOrDefault();
+        if (Image != null)
+        {
+            // return "UserImages/" + Image.LinkName.Replace("https://localhost:7082/", "");
+            return UserImagesUrlSpecs.UrlUserImagestoRead + Image.LinkName.Replace("https://aymdate.runasp.net/", "");
+        }
+        return "css/Images/Default/user-icon-2400.png";
+    }
+
+    private IBrowserFile selectedFile;
+
+    private void HandleSelected(InputFileChangeEventArgs e)
+    {
+        selectedFile = e.File;
+        if (selectedFile != null)
+        {
+            if (selectedFile != null && selectedFile.Size > maxFileSize)
+            {
+                ShowAlert("File size exceeds the maximum allowed size of 300 KB!");
+            }
+            else
+            {
+                // Display a preview of the photo before uploading
+                using var stream = selectedFile.OpenReadStream();
+                var buffer = new byte[selectedFile.Size];
+                stream.ReadAsync(buffer);
+            }
+        }
+
+
+
+    }
+    private async Task UploadFile(int type)
+    {
+        try
+        {
+            if (selectedFile != null)
+            {
+
+                if (selectedFile != null && selectedFile.Size > maxFileSize)
+                {
+                    await ShowAlert("File size exceeds the maximum allowed size of 300 KB!");
+
+                }
+
+                var formFile = new BrowserFileWrapper(selectedFile);
+
+                var content = new MultipartFormDataContent();
+                var fileStream = formFile.OpenReadStream(); // Max 10MB
+                var fileContent = new StreamContent(fileStream);
+                fileContent.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue(formFile.ContentType);
+                content.Add(fileContent, "file", formFile.Name);
+
+
+                if (type == 5)
+                {
+                    var Result = await _apiServiceLogin.SendUploadUserMainImageForCurrentUser(content);
+                }
+                else
+                {
+                    var Result = await _apiServiceLogin.SendUploadUserOtherImageForCurrentUser(content, type);
+                }
+                selectedFile = null;
+                userHistory = await _apiServiceLogin.GetUserHistoryWithFullImagesByUserId(_AppState.CurrentUserHistoryDTO.AppUserId);
+                StateHasChanged();
+            }
+            else
+                await ShowAlert("Please Select Image!");
+        }
+
+        catch (Exception)
+        {
+            await ShowAlert("Error, Please Try Again!");
+        }
+        
+    }
+
+
+    private UserHistoryDTO userHistory;
+    private IReadOnlyList<Country> Countries;
+    private IReadOnlyList<Gender> Genders;
+    private IReadOnlyList<Job> Jobs;
+    private IReadOnlyList<Education> Educations;
+    private IReadOnlyList<Purpose> Purposes;
+    private IReadOnlyList<FinancialMode> FinancialModes;
+    private IReadOnlyList<Language> Languages;
+    private IReadOnlyList<MaritalStatus> MaritalStatuses;
+
+    private async Task HandleuserHistoryUpdate()
+    {
+        try
+        {
+
+            var UpdateUserHistory = await _apiServiceLogin.SendUpdateHistoryWithMainImagesForCurrentUser(userHistory);
+
+            if (UpdateUserHistory)
+            {
+                await ShowAlert("Updates were saved.");
+                StateHasChanged();
+            }
+
+
+        }
+        catch (Exception ex)
+        {
+            // Handle login failure (e.g., show an error message)
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+
+            var AllLookUps = await _apiServiceLogin.GetAllLookUpTablesForUserProfile();
+
+            Countries = AllLookUps.AllCountries;
+            Genders = AllLookUps.AllGenders;
+            Educations = AllLookUps.AllEducations;
+            MaritalStatuses = AllLookUps.AllMaritalStatuses;
+            FinancialModes = AllLookUps.AllFinancialModes;
+            Jobs = AllLookUps.AllJobs;
+            Languages = AllLookUps.AllLanguages;
+            Purposes = AllLookUps.AllPurposes;
+            try
+            {
+                if (_AppState.CurrentUserHistoryDTO.AppUserId != null)
+                {
+                    userHistory = await _apiServiceLogin.GetUserHistoryWithFullImagesByUserId(_AppState.CurrentUserHistoryDTO.AppUserId);
+                }
+            }
+            catch (Exception e)
+            {
+;
+            }
+
+        }
+        catch (Exception ex)
+        {
+            GoToWrongArea();
+        }
+    }
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+
+
+    }
+}
+
+}
+else
+    UnAuthorizedUser();

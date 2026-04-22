@@ -1,0 +1,264 @@
+﻿@page "/userDetails/{Username}"
+
+@if (_AppState.isAuthenticated)
+{
+@inherits Users
+
+@using AYMDating.API.DTO
+@using AYMDating.API.Helpers
+@using AYMDating.Blazor.Data.Helpers
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+@inject AppState _AppState
+@inject IJSRuntime JSRuntime
+
+<PageTitle>User Details</PageTitle>
+
+<link href="Lightbox/dist/css/lightbox.min.css" rel="stylesheet" />
+<script src="Lightbox/dist/js/lightbox-plus-jquery.min.js"></script>
+
+
+@if (userHistoryDTO == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <div class="container">
+        <div class="row">
+            <div class="col-md-5 text-center">
+                 <div class="rounded">
+@*                     <img src="@GetUserImage(userHistoryDTO.MainImage)" alt="Image" class="img-fluid" />
+ *@                        <a class="example-image-link" href="@GetUserImage(userHistoryDTO.MainImage)" data-lightbox="example-set" data-title="@userHistoryDTO.AppUser.UserName- Main">
+                            <img src="@GetUserImage(userHistoryDTO.MainImage)" title="@userHistoryDTO.AppUser.UserName- Main" class="img-fluid photo-box rounded" />
+                        </a>
+                </div>
+                <div class="d-flex row p-1">
+                        <div class="col-md-3 rounded">
+                            <a class="example-image-link" href="@GetUserImageOrdered(1)" data-lightbox="example-set" data-title="@userHistoryDTO.AppUser.UserName- 1">
+                                <img src="@GetUserImageOrdered(1)" title="@userHistoryDTO.AppUser.UserName- 1" class="img-fluid photo-box2 rounded"  />
+                            </a>
+                        </div>
+                        <div class="col-md-3 rounded">
+                            <a class="example-image-link" href="@GetUserImageOrdered(2)" data-lightbox="example-set" data-title="@userHistoryDTO.AppUser.UserName- 2">
+                                <img src="@GetUserImageOrdered(2)" title="@userHistoryDTO.AppUser.UserName- 2" class="img-fluid photo-box2 rounded"  />
+                            </a>
+                        </div>
+                        <div class="col-md-3 rounded">
+                            <a class="example-image-link" href="@GetUserImageOrdered(3)" data-lightbox="example-set" data-title="@userHistoryDTO.AppUser.UserName- 3">
+                                <img src="@GetUserImageOrdered(3)" title="@userHistoryDTO.AppUser.UserName- 3" class="img-fluid photo-box2 rounded" />
+                            </a>
+                        </div>
+                        <div class="col-md-3 rounded">
+                            <a class="example-image-link" href="@GetUserImageOrdered(4)" data-lightbox="example-set" data-title="@userHistoryDTO.AppUser.UserName- 4">
+                                <img src="@GetUserImageOrdered(4)" title="@userHistoryDTO.AppUser.UserName- 4" class="img-fluid photo-box2 rounded"  />
+                            </a>
+                        </div>
+                </div>
+            </div>
+
+            <div class="col-md-7 text-center">
+                    <p>@userHistoryDTO.ProfileHeading</p>
+                    <div class="d-flex align-items-center">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td class="userProperty">Property</td>
+                                    <td class="currentUserPropertySituation">
+                                        You
+                                    </td>
+                                    <td class="UserPropertySituation">
+                                        @userHistoryDTO.AppUser.UserName
+                                    </td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="userProperty">
+                                        Country:
+                                    </td>
+                                    <td class="currentUserPropertySituation">
+                                        @_AppState.CurrentUserHistoryDTO.Country.Name
+                                    </td>
+                                    <td class="UserPropertySituation">
+                                        @userHistoryDTO.Country.Name
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="userProperty">
+                                        City:
+                                    </td>
+                                    <td class="currentUserPropertySituation">
+                                        @_AppState.CurrentUserHistoryDTO.City
+                                    </td>
+                                    <td class="UserPropertySituation">
+                                        @userHistoryDTO.City
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="userProperty">
+                                        Age:
+                                    </td>
+                                    <td class="currentUserPropertySituation">
+                                        @GetUserAge(_AppState.CurrentUserHistoryDTO.AppUser.DateOfBirth)
+                                    </td>
+                                    <td class="UserPropertySituation">
+                                        @GetUserAge(userHistoryDTO.AppUser.DateOfBirth)
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="userProperty">
+                                        Language:
+                                    </td>
+                                    <td class="currentUserPropertySituation">
+                                        @_AppState.CurrentUserHistoryDTO.Language.Name
+                                    </td>
+                                    <td class="UserPropertySituation">
+                                        @userHistoryDTO.Language.Name
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="userProperty">
+                                        Gender:
+                                    </td>
+                                    <td class="currentUserPropertySituation">
+                                        @_AppState.CurrentUserHistoryDTO.Gender.Name
+                                    </td>
+                                    <td class="UserPropertySituation">
+                                        @userHistoryDTO.Gender.Name
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="userProperty">
+                                        MaritalStatus:
+                                    </td>
+                                    <td class="currentUserPropertySituation">
+                                        @_AppState.CurrentUserHistoryDTO.MaritalStatus.Name
+                                    </td>
+                                    <td class="UserPropertySituation">
+                                        @userHistoryDTO.MaritalStatus.Name
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="userProperty">
+                                        Purpose:
+                                    </td>
+                                    <td class="currentUserPropertySituation">
+                                        @_AppState.CurrentUserHistoryDTO.Purpose.Name
+                                    </td>
+                                    <td class="UserPropertySituation">
+                                        @userHistoryDTO.Purpose.Name
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="userProperty">
+                                        Education:
+                                    </td>
+                                    <td class="currentUserPropertySituation">
+                                        @_AppState.CurrentUserHistoryDTO.Education.Name
+                                    </td>
+                                    <td class="UserPropertySituation">
+                                        @userHistoryDTO.Education.Name
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="userProperty">
+                                        Job:
+                                    </td>
+                                    <td class="currentUserPropertySituation">
+                                        @_AppState.CurrentUserHistoryDTO.Job.Name
+                                    </td>
+                                    <td class="UserPropertySituation">
+                                        @userHistoryDTO.Job.Name
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="userProperty">
+                                        Financial Mode:
+                                    </td>
+                                    <td class="currentUserPropertySituation">
+                                        @_AppState.CurrentUserHistoryDTO.FinancialMode.Name
+                                    </td>
+                                    <td class="UserPropertySituation">
+                                        @userHistoryDTO.FinancialMode.Name
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="d-flex align-items-center justify-content-center m-auto mb-5 w-75">
+                        <div class="d-flex align-items-center flex-row">
+                        </div>
+                        <img src="@GetUserOnlineLogo(forecast.IsCurrentUserOnline)" title="@((forecast.IsCurrentUserOnline ? "Online" : "Offline"))" alt="@GetAltText(forecast.IsCurrentUserOnline)" class="img-fluid" style="max-width: 10%;" />
+                        &ensp;
+                        <img src=@GetUserVerifiedLogo(forecast.IsCurrentUserVerified) title="@(forecast.IsCurrentUserVerified?"Verified":"Unverified")" alt="Verified" class="img-fluid" style="max-width: 10%;" /> |||||||
+                        <img src="@GetpackageImage((int)forecast.UserPackage.PackageId)" title="@forecast.UserPackage.Package.Name" class="img-fluid" style="max-width: 10%;" />||
+                        <img src="@GetUserIsLiked(forecast.IsLikedFromCurrentUser)" alt="Add Like" title="Add Like to this User" class="img-fluid" style="max-width: 12%;" @onclick="() => AddRemoveLike(forecast.AppUserId,forecast.IsLikedFromCurrentUser)" /> || <img src="@GetUserIsFavorite(forecast.IsFavoriteFromCurrentUser)" alt="Add Favorite" title="Add this User To Your Favorites" class="img-fluid" style="max-width: 11%;" @onclick="() => AddRemoveFavorite(forecast.AppUserId,forecast.IsFavoriteFromCurrentUser)" /> || <img src="css/Images/Default/message-icon.png" alt="Messaging" title="Message this User" class="img-fluid" style="max-width: 11%;" @onclick="() => GoToChatWith(forecast.AppUser.UserName, forecast.AppUserId)" /> || <img src="@GetUserIsBlocked(forecast.IsBlockedFromCurrentUser)" alt="Blocking" title="Block Or Unblock This User" class="img-fluid" style="max-width: 11%;" @onclick="() => AddRemoveBlocking(forecast.AppUserId,forecast.IsBlockedFromCurrentUser)" /> || <img src="css/Images/Default/complaintsUserIcon.png" alt="Add Report" title="Report This User" class="img-fluid" style="max-width: 12%;" @onclick="() => AddReport(forecast.AppUserId)" />
+                    </div>
+                </div>
+        </div>
+
+
+        <div class="col-md-12">
+                <label><b>Intro About Me:</b></label>
+                <p>@userHistoryDTO.AboutYou</p>
+        </div>
+
+         <div class="col-md-12">
+                <label><b>Intro About My Partner:</b></label>
+                <p>@userHistoryDTO.AboutPartner</p>
+        </div>
+    </div>
+}
+
+
+
+
+@code {
+
+    protected UserHistoryDTO? forecast;
+
+
+    [Parameter]
+    public string UserName { get; set; }
+
+    private UserHistoryDTO? userHistoryDTO;
+
+    private string GetUserImageOrdered(int order)
+    {
+        var Image = userHistoryDTO.OtherImages.Where(a => a.Order == order).FirstOrDefault();
+        if (Image != null)
+        {
+            // return "UserImages/" + Image.LinkName.Replace("https://localhost:7082/", "");
+            return UserImagesUrlSpecs.UrlUserImagestoRead + Image.LinkName.Replace("https://aymdate.runasp.net/", "");
+        }
+        return "css/Images/Default/user-icon-2400.png";
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var UserId = _AppState.AllUsers.Where(a => a.AppUser.UserName == UserName).FirstOrDefault().AppUserId;
+            forecast = _AppState.AllUsers.Where(a => a.AppUserId == UserId).FirstOrDefault();
+
+            await _apiServiceLogin.SendViewFromCurrentUserToAnother(new UserViewOrLikeOrFavoriteOrBlockOrReportDTO() { ReceiverAppUserId = UserId });
+            userHistoryDTO = await _apiServiceLogin.GetUserHistoryWithFullImagesByUserId(UserId);
+        }
+        catch (Exception ex)
+        {
+            GoToWrongArea();
+        }
+
+    }
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+
+    }
+
+}
+
+    }
+    else
+        UnAuthorizedUser();

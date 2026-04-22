@@ -1,0 +1,161 @@
+is_global = true
+build_property.TargetFramework = net6.0
+build_property.TargetPlatformMinVersion = 
+build_property.UsingMicrosoftNETSdkWeb = true
+build_property.ProjectTypeGuids = 
+build_property.InvariantGlobalization = 
+build_property.PlatformNeutralAssembly = 
+build_property.EnforceExtendedAnalyzerRules = 
+build_property._SupportedPlatformList = Linux,macOS,Windows
+build_property.RootNamespace = AYMDating.Blazor
+build_property.RootNamespace = AYMDating.Blazor
+build_property.ProjectDir = C:\Users\ayman\Documents\GitHub\AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment\AYMDating.API\AYMDating.Blazor\
+build_property.EnableComHosting = 
+build_property.EnableGeneratedComInterfaceComImportInterop = 
+build_property.RazorLangVersion = 6.0
+build_property.SupportLocalizedComponentNames = 
+build_property.GenerateRazorMetadataSourceChecksumAttributes = 
+build_property.MSBuildProjectDirectory = C:\Users\ayman\Documents\GitHub\AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment\AYMDating.API\AYMDating.Blazor
+build_property._RazorSourceGeneratorDebug = 
+build_property.EffectiveAnalysisLevelStyle = 6.0
+build_property.EnableCodeStyleSeverity = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/App.razor]
+build_metadata.AdditionalFiles.TargetPath = QXBwLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/ActivateAcAgain.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWN0aXZhdGVBY0FnYWluLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/ActivateAccount.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQWN0aXZhdGVBY2NvdW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/CancelPayment.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2FuY2VsUGF5bWVudC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/Chat.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ2hhdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/ContactUs.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcQ29udGFjdFVzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/ForgotPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRm9yZ290UGFzc3dvcmQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/Index.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXgucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/IndexUser.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcSW5kZXhVc2VyLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/Login.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9naW4ucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/Logout.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTG9nb3V0LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/MemberShips.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcTWVtYmVyU2hpcHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/Register.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVnaXN0ZXIucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/ResetPassword.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcUmVzZXRQYXNzd29yZC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/SuccessPayment.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3VjY2Vzc1BheW1lbnQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/SwitchOffOrDeleteAccount.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3dpdGNoT2ZmT3JEZWxldGVBY2NvdW50LnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/SwitchOnAcAgain.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcU3dpdGNoT25BY0FnYWluLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/UserBlocks.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlckJsb2Nrcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/UserDetails.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlckRldGFpbHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/UserFavorites.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlckZhdm9yaXRlcy5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/UserLikes.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlckxpa2VzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/UserMatch.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlck1hdGNoLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/UserMessages.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlck1lc3NhZ2VzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/UserOnline.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlck9ubGluZS5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/UserProfile.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclByb2ZpbGUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/Users.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlcnMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/UserSearch.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclNlYXJjaC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/UserViews.razor]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcVXNlclZpZXdzLnJhem9y
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Shared/SurveyPrompt.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXFN1cnZleVByb21wdC5yYXpvcg==
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/_Imports.razor]
+build_metadata.AdditionalFiles.TargetPath = X0ltcG9ydHMucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Shared/MainLayout.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE1haW5MYXlvdXQucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-knoo1n9u38
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Shared/NavMenu.razor]
+build_metadata.AdditionalFiles.TargetPath = U2hhcmVkXE5hdk1lbnUucmF6b3I=
+build_metadata.AdditionalFiles.CssScope = b-579zx1zy4m
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/Error.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcRXJyb3IuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/_Host.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0hvc3QuY3NodG1s
+build_metadata.AdditionalFiles.CssScope = 
+
+[C:/Users/ayman/Documents/GitHub/AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment/AYMDating.API/AYMDating.Blazor/Pages/_Layout.cshtml]
+build_metadata.AdditionalFiles.TargetPath = UGFnZXNcX0xheW91dC5jc2h0bWw=
+build_metadata.AdditionalFiles.CssScope = 

@@ -1,0 +1,297 @@
+﻿@page "/memberShips"
+@if (_AppState.isAuthenticated)
+{
+@inherits Login
+
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using static AYMDating.Blazor.Data.Helpers.ApiServiceLogin
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+@inject AppState _AppState
+@inject IJSRuntime JSRuntime
+
+<PageTitle>MemberShips</PageTitle>
+
+
+<style>
+    .custom-dropdown-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .custom-dropdown {
+        padding: 10px;
+        font-size: 16px;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        background-color: #f9f9f9;
+        cursor: pointer;
+        width: 100%;
+    }
+
+    .custom-dropdown-content {
+        display: none;
+        position: absolute;
+        background-color: #f9f9f9;
+        min-width: 160px;
+        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+        z-index: 1;
+    }
+
+    .custom-dropdown-container:hover .custom-dropdown-content {
+        display: block;
+    }
+
+    .custom-dropdown-item {
+        color: black;
+        padding: 12px 16px;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+    }
+
+        .custom-dropdown-item img {
+            margin-right: 10px;
+        }
+
+        .custom-dropdown-item:hover {
+            background-color: #f1f1f1;
+        }
+
+    .subscription-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+        justify-content: center;
+    }
+
+    .subscription-card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        padding: 20px;
+        width: 200px;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease;
+    }
+
+        .subscription-card:hover {
+            transform: scale(1.05);
+        }
+
+    .subscription-image {
+        max-width: 100%;
+        border-radius: 8px;
+    }
+
+    .subscription-details {
+        margin-top: 15px;
+    }
+
+        .subscription-details h3 {
+            margin: 10px 0;
+            font-size: 1.5em;
+        }
+
+        .subscription-details p {
+            font-size: 1em;
+            color: #555;
+        }
+
+        .subscription-details button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            .subscription-details button:hover {
+                background-color: #0056b3;
+            }
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+    }
+
+    .subscription-modal {
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 8px;
+        text-align: center;
+        width: 400px;
+        position: relative;
+    }
+
+    .modal-image {
+        max-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .subscription-modal h2 {
+        margin-bottom: 20px;
+    }
+
+    .subscription-modal button {
+        padding: 10px 20px;
+        border: none;
+        background-color: #007bff;
+        color: #fff;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+</style>
+
+<h3>Select a Package to buy</h3>
+<p>Payment will be using Paypal / Debit or Credit Card, it will according to your selected package + 4% as payment fees.</p>
+
+<div class="mb-5">
+
+@* <div class="custom-dropdown-container">
+    <select @onchange="OnAmountSelected" class="custom-dropdown">
+        @foreach (var option in options)
+        {
+            <option value="@option.Amount">@option.Amount USD</option>
+        }
+    </select>
+
+    <div class="custom-dropdown-content">
+        @foreach (var option in options)
+        {
+            <div class="custom-dropdown-item" @onclick="() => HandlePayment1(option.Amount)">
+                <img src="@GetpackageImage(option.ImageId)" title="@option.ImageId" class="img-fluid" style="max-width: 11%;" />
+                <span>@option.Amount USD</span>
+            </div>
+        }
+    </div>
+</div>
+
+<button class="btn btn-outline-secondary" @onclick="HandlePayment">Pay Now</button>
+ *@
+</div>
+@* <select @bind="selectedAmountInDollars">
+    <option value="10">10 USD <img src="@GetpackageImage((int)2)" title="2" class="img-fluid" style="max-width: 11%;" /></option>
+    <option value="25">25 USD <img src="@GetpackageImage((int)3)" title="2" class="img-fluid" style="max-width: 11%;" /></option>
+    <option value="50">50 USD <img src="@GetpackageImage((int)4)" title="4" class="img-fluid" style="max-width: 11%;" /></option>
+    <option value="100">100 USD <img src="@GetpackageImage((int)5)" title="5" class="img-fluid" style="max-width: 11%;" /></option>
+</select> *@
+
+<div class="subscription-container row">
+    @foreach (var option in options)
+    {
+        <div class="subscription-card col-md-3">
+            <img src="@GetpackageImage(option.ImageId)" alt="@option.Amount USD" class="subscription-image" />
+            <div class="subscription-details">
+                <h3>@option.Amount USD</h3>
+                <p>@GetPackageDescription(option.Amount)</p>
+                  <button @onclick="() => ShowMoreDetails(option)">Read More</button>
+@*                  <button @onclick="() => HandlePayment1(option.Amount)">Buy Now</button>
+ *@            </div>
+        </div>
+    }
+</div>
+
+@if (selectedOption != null)
+{
+    <div class="modal-overlay" @onclick="CloseModal">
+        <div class="subscription-modal">
+            <h2>@selectedOption.Amount USD</h2>
+            <img src="@GetpackageImage(selectedOption.ImageId)" alt="@selectedOption.Amount USD" class="modal-image" />
+            <p>@GetPackageDescription(selectedOption.Amount)</p>
+            <div class="mb-2">
+                <button @onclick="() => HandlePayment1(selectedOption.Amount)">Buy Now</button>
+            </div>
+            <button @onclick="CloseModal">Close</button>
+        </div>
+    </div>
+}
+
+
+
+@code {
+
+    private List<Option> options = new()
+    {
+        new Option { Amount = 10, ImageId = 2 },
+        new Option { Amount = 25, ImageId = 3 },
+        new Option { Amount = 50, ImageId = 4 },
+        new Option { Amount = 100, ImageId = 5 },
+    };
+
+    private Option? selectedOption;
+
+    private void ShowMoreDetails(Option option)
+    {
+        selectedOption = option;
+    }
+    public string GetPackageDescription(int amount)
+    {
+        // Return a description based on the subscription amount
+        return amount switch
+        {
+            10 => "Basic subscription 7 Days/Metallic",
+            25 => "Standard subscription 30 Day/Bronze.",
+            50 => "Premium subscription 180 Day/Silver.",
+            100 => "Ultimate subscription 360 Day/Golden.",
+            _ => "Unknown subscription."
+        };
+    }
+    private void CloseModal()
+    {
+        selectedOption = null;
+    }
+
+    private void OnAmountSelected(ChangeEventArgs e)
+    {
+        selectedAmountInDollars = int.Parse(e.Value.ToString());
+        // You can also update the selected image here if needed
+    }
+
+    public class Option
+    {
+        public int Amount { get; set; }
+        public int ImageId { get; set; }
+    }
+
+
+
+    private int selectedAmountInDollars = 10; // Default to 1 USD
+
+    // private async Task HandlePayment()
+    // {
+    //     PaymentResponse result = await _apiServiceLogin.CreateMemberShipForUser(selectedAmountInDollars);
+    //     if (result?.ApprovalUrl != null)
+    //     {
+    //         Navigation.NavigateTo(result.ApprovalUrl);
+    //     }
+    // }
+
+    private async Task HandlePayment1(int amountUSD)
+    {
+        var fees = (amountUSD * 4) / 100 < 1 ? 1 : (amountUSD * 4) / 100;
+        PaymentResponse result = await _apiServiceLogin.CreateMemberShipForUser(amountUSD + fees);
+        if (result?.ApprovalUrl != null)
+        {
+            Navigation.NavigateTo(result.ApprovalUrl);
+        }
+    }
+
+}
+
+
+}
+else
+    UnAuthorizedUser();

@@ -1,0 +1,827 @@
+﻿@* @inherits LayoutComponentBase
+
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ApiServiceLogin _apiServiceLogin
+@inject NavigationManager Navigation
+@inject JsInteropService JsInterop
+@inject AppState _AppState
+
+<PageTitle>AYM Dating</PageTitle>
+<style>
+    .dropdown-menu {
+        display: none;
+        position: absolute;
+        background-color: white;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 1;
+    }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 6px 8px;
+            text-decoration: none;
+            color: black;
+        }
+
+            .dropdown-menu a:hover {
+                background-color: #f1f1f1;
+            }
+
+        /* Show the dropdown */
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        /* Hide the dropdown */
+        .dropdown-menu.hide {
+            display: none;
+        }
+
+    .imagelogo{
+        width:10%;
+        height:5%;
+    }
+</style>
+
+<div class="page">
+    @if (_AppState.isAuthenticated)
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+
+        <main>
+            <div class="top-row px-4 d-flex justify-content-between">
+                <div>
+                <span @onclick="NavigateToComponent8">Online</span>
+                </div>
+                <div class="position-relative">
+                    <span @onclick="ToggleDropdown2">Search</span>
+                    <div class="dropdown-menu @(isDropdownVisible2 ? "show" : "hide")">
+                        <a @onclick="NavigateToComponent6">Match</a>
+                        <a @onclick="NavigateToComponent7">Search</a>
+                    </div>
+                </div>
+                <div>
+                <span @onclick="NavigateToComponent1">Message(@(_AppState.CurrentUserHistoryDTO.AppUserId != null ? _AppState.CurrentUserHistoryDTO.CounterOfNewMessages : 0))</span>
+                </div>
+                <div class="position-relative">
+                    <span @onclick="ToggleDropdown1">Activity(@(_AppState.CurrentUserHistoryDTO.CounterOfNewLikes + _AppState.CurrentUserHistoryDTO.CounterOfNewFavorites + _AppState.CurrentUserHistoryDTO.CounterOfNewViews + _AppState.CurrentUserHistoryDTO.CounterOfNewBlocks))</span>
+                    <div class="dropdown-menu @(isDropdownVisible1 ? "show" : "hide")">
+                        <a @onclick="NavigateToComponent2">Likes (@(_AppState.CurrentUserHistoryDTO.AppUserId != null ? _AppState.CurrentUserHistoryDTO.CounterOfNewLikes : 0))</a>
+                        <a @onclick="NavigateToComponent3">Favorites (@(_AppState.CurrentUserHistoryDTO.AppUserId != null ? _AppState.CurrentUserHistoryDTO.CounterOfNewFavorites : 0))</a>
+                        <a @onclick="NavigateToComponent4">Profile Views (@(_AppState.CurrentUserHistoryDTO.AppUserId != null ? _AppState.CurrentUserHistoryDTO.CounterOfNewViews : 0))</a>
+                        <a @onclick="NavigateToComponent5">Block List (@(_AppState.CurrentUserHistoryDTO.AppUserId != null ? _AppState.CurrentUserHistoryDTO.CounterOfNewBlocks : 0))</a>
+                    </div>
+                </div>
+                <div>
+                    <NavLink class="nav-link" href="memberShips">
+                        <span class="oi oi-move" aria-hidden="true"></span> MemberShips
+                    </NavLink>
+                </div>
+
+
+                <div class="d-flex align-items-center justify-content-between">
+                <NavLink class="nav-link" href="logOut">
+                    <span class="oi oi-account-logout" aria-hidden="true"></span> LogOut
+                </NavLink>
+                    <div>
+                    <span>Hello: @(_AppState.CurrentUserHistoryDTO.AppUserId != null ? _AppState.CurrentUserHistoryDTO.AppUser.UserName : 0)</span>
+                    </div>
+                </div>
+            </div>
+
+
+           <article class="content px-4">
+                @Body
+            </article>
+        </main>
+    }
+    else
+    {
+
+		<link rel="stylesheet" href="html5up-dimension/assets/css/main.css" />
+		<noscript><link rel="stylesheet" href="html5up-dimension/assets/css/noscript.css" /></noscript>
+
+		<main class="is-preload">
+
+			<!-- Wrapper -->
+			<div id="wrapper">
+
+				<!-- Header -->
+				<header id="header">
+                    <div class="logo d-flex flex-column justify-content-center align-items-center" style="background-color:#8369cd;">
+
+                        <span class="d-flex flex-column justify-content-center align-items-center">
+                            <img src="css/Images/Default/aymlogo.png" class="img-fluid" />
+                        </span>
+
+					</div>
+                    <nav>
+                        <ul>
+                            <li><NavLink href="/">Home</NavLink></li>
+                            <li><NavLink href="login">login</NavLink></li>
+                            <li><NavLink href="register">Register</NavLink></li>
+                            <li><NavLink href="contactUs">Contact</NavLink></li>
+                        </ul>
+                    </nav>
+					<div class="content">
+						<div class="inner">
+							@Body
+						</div>
+					</div>
+
+				</header>
+
+				<!-- Main -->
+
+                <div class="container text-center mh-100 mb-2">
+                </div>
+
+				<!-- Footer -->
+				<footer id="footer">
+                    <p class="copyright">&copy; Developed by: <a href="https://facebook.com/SalmaSoftOfficial/">SalmaSoft</a>.</p>
+				</footer>
+
+			</div>
+
+			<!-- BG -->
+			<div id="bg"></div>
+
+			<!-- Scripts -->
+			<script src="html5up-dimension/assets/js/browser.min.js"></script>
+			<script src="html5up-dimension/assets/js/breakpoints.min.js"></script>
+			<script src="html5up-dimension/assets/js/util.js"></script>
+			<script src="html5up-dimension/assets/js/main.js"></script>
+
+		</main>
+
+    }
+
+
+
+
+
+</div>
+
+
+@code {
+    public string UserNameLogged = "000";
+    private int currentCount = 0;
+    private Timer timer;
+
+
+    private bool isDropdownVisible1 = false;
+    private bool isDropdownVisible2 = false;
+
+    private void ToggleDropdown1()
+    {
+        isDropdownVisible1 = !isDropdownVisible1;
+    }
+    private void ToggleDropdown2()
+    {
+        isDropdownVisible2 = !isDropdownVisible2;
+    }
+
+    private void NavigateToComponent1()
+    {
+        isDropdownVisible1 = false;
+        isDropdownVisible2 = false;
+        Navigation.NavigateTo("/userMessages");
+    }
+    private void NavigateToComponent2()
+    {
+        isDropdownVisible1 = false;
+        isDropdownVisible2 = false;
+        Navigation.NavigateTo("/userLikes");
+    }
+
+    private void NavigateToComponent3()
+    {
+        isDropdownVisible1 = false;
+        isDropdownVisible2 = false;
+        Navigation.NavigateTo("/userFavorites");
+    }
+
+    private void NavigateToComponent4()
+    {
+        isDropdownVisible1 = false;
+        isDropdownVisible2 = false;
+        Navigation.NavigateTo("/userViews");
+    }
+    private void NavigateToComponent5()
+    {
+        isDropdownVisible1 = false;
+        isDropdownVisible2 = false;
+        Navigation.NavigateTo("/userBlocks");
+    }
+
+    private void NavigateToComponent6()
+    {
+        isDropdownVisible1 = false;
+        isDropdownVisible2 = false;
+        Navigation.NavigateTo("/userMatch");
+    }
+    private void NavigateToComponent7()
+    {
+        isDropdownVisible1 = false;
+        isDropdownVisible2 = false;
+        Navigation.NavigateTo("/userSearch");
+    }
+
+    private void NavigateToComponent8()
+    {
+        isDropdownVisible1 = false;
+        isDropdownVisible2 = false;
+        Navigation.NavigateTo("/userOnline");
+    }
+
+    protected async Task ShowAlert(string message)
+    {
+        await JsInterop.ShowAlert(message);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (_AppState.CurrentUserHistoryDTO != null)
+        {
+            UserNameLogged = _AppState.CurrentUserHistoryDTO.AppUser.UserName;
+        }
+
+    }
+
+    private void Callback(object state)
+    {
+        // Invoke the function that needs to be run every 10 seconds
+        if (_AppState.CurrentUserHistoryDTO != null)
+        {
+            try
+            {
+                _AppState.AllUsers = _apiServiceLogin.GetUserHistoriesWithMainImagesForAll().Result;
+                _AppState.CurrentUserHistoryDTO = _apiServiceLogin.GetHistoryWithMainImagesForCurrentUser().Result;
+            }
+            catch (Exception ex)
+            {
+
+            }
+        }
+
+        IncrementCounter();
+    }
+
+
+    private void IncrementCounter()
+    {
+        // Update the counter
+        currentCount++;
+
+        // Trigger UI update
+        InvokeAsync(StateHasChanged);
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            timer = new Timer(Callback, null, 0, 30000); // Execute every 10 seconds
+            StateHasChanged();
+        }
+
+    }
+
+}
+ *@
+
+ @inherits LayoutComponentBase
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using Microsoft.AspNetCore.Components.Authorization
+@using System.Security.Claims
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject ApiServiceLogin _apiServiceLogin
+@inject NavigationManager Navigation
+@inject JsInteropService JsInterop
+@inject AppState _AppState
+
+<PageTitle>AYM Dating - Find Your Perfect Match</PageTitle>
+
+<style>
+    .main-container {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    }
+
+    .content-wrapper {
+    width: 100%;
+    margin: 0 auto;
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    }
+
+    .centered-content {
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    @@media (max-width: 768px) {
+    .centered-content {
+    padding: 1rem;
+    box-shadow: none;
+    }
+    }
+    /* Main Layout Styles */
+    .page {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    background-color: #f8f9fa;
+    }
+
+    /* Authenticated Layout */
+    .authenticated-layout {
+    display: flex;
+    flex: 1;
+    }
+
+    .sidebar {
+    width: 250px;
+    background: #2c3e50;
+    color: white;
+    position: fixed;
+    height: 100vh;
+    z-index: 100;
+    transition: all 0.3s;
+    }
+
+    main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    }
+
+    .top-row {
+    background: white;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    padding: 1rem;
+    z-index: 90;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 1.5rem;
+    }
+
+    .top-row span {
+    cursor: pointer;
+    font-weight: 500;
+    color: #555;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: all 0.2s;
+    padding: 0.5rem 0;
+    }
+
+    .top-row span:hover {
+    color: white;
+    }
+
+    .notification-badge {
+    background: #ff6b8b;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    margin-left: 5px;
+    }
+
+    .dropdown-menu {
+    position: absolute;
+    background-color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    padding: 0.5rem 0;
+    z-index: 1000;
+    right: 0;
+    top: 100%;
+    min-width: 200px;
+    transform: translateY(10px);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.2s ease;
+    }
+
+    .dropdown-menu.show {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+    }
+
+    .dropdown-menu a {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    text-decoration: none;
+    color: #333;
+    transition: all 0.2s;
+    }
+
+    .dropdown-menu a:hover {
+    background-color: #f8f9fa;
+    color: #ff6b8b;
+    }
+
+    .dropdown-menu .badge {
+    margin-left: auto;
+    background: #ff6b8b;
+    color: white;
+    border-radius: 10px;
+    padding: 2px 6px;
+    font-size: 0.7rem;
+    }
+
+    .user-greeting {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: black;
+    }
+
+    .user-greeting strong {
+    color: white;
+    ;
+    }
+
+    .content {
+    flex: 1;
+    padding: 2rem;
+    background-color: white;
+    margin: 1rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+
+    /* Unauthenticated Layout */
+    .unauthenticated-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    }
+
+    .dimension-header {
+    text-align: center;
+    padding: 2rem 0;
+    }
+
+    .dimension-logo {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ff6b8b 0%, #8369cd 100%);
+    border-radius: 50%;
+    padding: 1rem;
+    }
+
+    .dimension-logo img {
+    max-width: 100%;
+    max-height: 100%;
+    }
+
+    .dimension-nav {
+    margin: 2rem 0;
+    }
+
+    .dimension-nav ul {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    padding: 0;
+    list-style: none;
+    }
+
+    .dimension-nav a {
+    color: #333;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    transition: all 0.2s;
+    }
+
+    .dimension-nav a:hover {
+    color: #ff6b8b;
+    background: rgba(255,107,139,0.1);
+    }
+
+    .dimension-footer {
+    text-align: center;
+    padding: 2rem;
+    margin-top: auto;
+    color: #666;
+    }
+
+    /* Responsive */
+    @@media (max-width: 992px) {
+    .sidebar {
+    width: 70px;
+    overflow: hidden;
+    }
+
+    main {
+    margin-left: 70px;
+    }
+    }
+
+    @@media (max-width: 768px) {
+    .sidebar {
+    width: 0;
+    }
+
+    main {
+    margin-left: 0;
+    }
+
+    .top-row {
+    justify-content: space-around;
+    padding: 0.5rem;
+    }
+
+    .dimension-nav ul {
+    flex-direction: column;
+    gap: 1rem;
+    }
+    }
+</style>
+
+<div class="page">
+    @if (_AppState.isAuthenticated)
+    {
+        <div class="authenticated-layout m-auto">
+            <div class="sidebar">
+                <NavMenu />
+            </div>
+
+            <main>
+                <div class="top-row">
+                    <div class="position-relative">
+                        <span @onclick="NavigateToComponent8">
+                            <i class="fas fa-wifi"></i>
+                            Online
+                        </span>
+                    </div>
+
+                    <div class="position-relative">
+                        <span @onclick="ToggleDropdown2">
+                            <i class="fas fa-search"></i>
+                            Search
+                        </span>
+                        <div class="dropdown-menu @(isDropdownVisible2 ? "show" : "")">
+                            <a @onclick="NavigateToComponent6">
+                                <i class="fas fa-heart mr-2"></i> &nbsp; Match
+                            </a>
+                            <a @onclick="NavigateToComponent7">
+                                <i class="fas fa-search mr-2"></i> &nbsp; Search
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <span @onclick="NavigateToComponent1">
+                            <i class="fas fa-envelope"></i>
+                            Messages
+                            @if (_AppState.CurrentUserHistoryDTO?.AppUserId != null && _AppState.CurrentUserHistoryDTO.CounterOfNewMessages > 0)
+                            {
+                                <span class="notification-badge">@_AppState.CurrentUserHistoryDTO.CounterOfNewMessages</span>
+                            }
+                        </span>
+                    </div>
+
+                    <div class="position-relative">
+                        <span @onclick="ToggleDropdown1">
+                            <i class="fas fa-bell"></i>
+                            Activity
+                            @{
+                                var totalActivity = (_AppState.CurrentUserHistoryDTO?.CounterOfNewLikes ?? 0) +
+                                (_AppState.CurrentUserHistoryDTO?.CounterOfNewFavorites ?? 0) +
+                                (_AppState.CurrentUserHistoryDTO?.CounterOfNewViews ?? 0) +
+                                (_AppState.CurrentUserHistoryDTO?.CounterOfNewBlocks ?? 0);
+                            }
+                            @if (totalActivity > 0)
+                            {
+                                <span class="notification-badge">@totalActivity</span>
+                            }
+                        </span>
+                        <div class="dropdown-menu @(isDropdownVisible1 ? "show" : "")">
+                            <a @onclick="NavigateToComponent2">
+                                <i class="fas fa-heart mr-2"></i> &nbsp; Likes
+                                @if (_AppState.CurrentUserHistoryDTO?.AppUserId != null)
+                                {
+                                    <span class="badge">@_AppState.CurrentUserHistoryDTO.CounterOfNewLikes</span>
+                                }
+                            </a>
+                            <a @onclick="NavigateToComponent3">
+                                <i class="fas fa-star mr-2"></i> &nbsp; Favorites
+                                @if (_AppState.CurrentUserHistoryDTO?.AppUserId != null)
+                                {
+                                    <span class="badge">@_AppState.CurrentUserHistoryDTO.CounterOfNewFavorites</span>
+                                }
+                            </a>
+                            <a @onclick="NavigateToComponent4">
+                                <i class="fas fa-eye mr-2"></i> &nbsp; Views
+                                @if (_AppState.CurrentUserHistoryDTO?.AppUserId != null)
+                                {
+                                    <span class="badge">@_AppState.CurrentUserHistoryDTO.CounterOfNewViews</span>
+                                }
+                            </a>
+                            <a @onclick="NavigateToComponent5">
+                                <i class="fas fa-ban mr-2"></i> &nbsp; Blocking
+                                @if (_AppState.CurrentUserHistoryDTO?.AppUserId != null)
+                                {
+                                    <span class="badge">@_AppState.CurrentUserHistoryDTO.CounterOfNewBlocks</span>
+                                }
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <NavLink class="nav-link" href="memberShips">
+                            <i class="fas fa-crown"></i> Memberships
+                        </NavLink>
+                    </div>
+
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="user-greeting">
+                            <i class="fas fa-user-circle"></i>
+                            <span class="text-white">Hello, <strong>@(_AppState.CurrentUserHistoryDTO?.AppUser?.UserName ?? "User")</strong></span>
+                        </div>
+                        <NavLink class="nav-link" href="logOut">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </NavLink>
+                    </div>
+                </div>
+
+                <article class="content">
+                    @Body
+                </article>
+            </main>
+        </div>
+    }
+    else
+    {
+        <div class="unauthenticated-layout m-auto">
+            <header class="dimension-header">
+                <div class="dimension-logo">
+                    <img src="css/Images/Default/aymlogo.png" alt="AYM Dating Logo" />
+                </div>
+                <nav class="dimension-nav">
+                    <ul>
+                        <li><NavLink href="/">Home</NavLink></li>
+                        <li><NavLink href="login">Login</NavLink></li>
+                        <li><NavLink href="register">Register</NavLink></li>
+                        <li><NavLink href="contactUs">Contact</NavLink></li>
+                    </ul>
+                </nav>
+            </header>
+
+
+            <main class="main-container">
+                @Body
+
+            </main>
+
+            <footer class="dimension-footer">
+                <p class="copyright">&copy; @DateTime.Now.Year AYMDating. All rights reserved | <a class="text-white" href="https://payhip.com/b/C4hrG" target="_blank">Buy it</a></p>
+            </footer>
+        </div>
+    }
+</div>
+
+@code {
+    private bool isDropdownVisible1 = false;
+    private bool isDropdownVisible2 = false;
+    private Timer timer;
+
+    private void ToggleDropdown1()
+    {
+        isDropdownVisible1 = !isDropdownVisible1;
+        isDropdownVisible2 = false;
+    }
+
+    private void ToggleDropdown2()
+    {
+        isDropdownVisible2 = !isDropdownVisible2;
+        isDropdownVisible1 = false;
+    }
+
+    private void CloseAllDropdowns()
+    {
+        isDropdownVisible1 = false;
+        isDropdownVisible2 = false;
+    }
+
+    private void NavigateToComponent1()
+    {
+        CloseAllDropdowns();
+        Navigation.NavigateTo("/userMessages");
+    }
+
+    private void NavigateToComponent2()
+    {
+        CloseAllDropdowns();
+        Navigation.NavigateTo("/userLikes");
+    }
+
+    private void NavigateToComponent3()
+    {
+        CloseAllDropdowns();
+        Navigation.NavigateTo("/userFavorites");
+    }
+
+    private void NavigateToComponent4()
+    {
+        CloseAllDropdowns();
+        Navigation.NavigateTo("/userViews");
+    }
+
+    private void NavigateToComponent5()
+    {
+        CloseAllDropdowns();
+        Navigation.NavigateTo("/userBlocks");
+    }
+
+    private void NavigateToComponent6()
+    {
+        CloseAllDropdowns();
+        Navigation.NavigateTo("/userMatch");
+    }
+
+    private void NavigateToComponent7()
+    {
+        CloseAllDropdowns();
+        Navigation.NavigateTo("/userSearch");
+    }
+
+    private void NavigateToComponent8()
+    {
+        CloseAllDropdowns();
+        Navigation.NavigateTo("/userOnline");
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        CloseAllDropdowns();
+
+        if (firstRender)
+        {
+            timer = new Timer(_ =>
+            {
+                InvokeAsync(async () =>
+                {
+                    try
+                    {
+                        _AppState.AllUsers = await _apiServiceLogin.GetUserHistoriesWithMainImagesForAll();
+                        _AppState.CurrentUserHistoryDTO = await _apiServiceLogin.GetHistoryWithMainImagesForCurrentUser();
+                        StateHasChanged();
+                    }
+                    catch { /* Handle error */ }
+                });
+            }, null, 0, 30000); // Update every 30 seconds
+        }
+    }
+
+
+    public void Dispose()
+    {
+        timer?.Dispose();
+    }
+}

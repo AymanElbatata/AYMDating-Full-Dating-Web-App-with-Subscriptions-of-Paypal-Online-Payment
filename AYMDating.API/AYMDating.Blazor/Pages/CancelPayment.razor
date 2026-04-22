@@ -1,0 +1,45 @@
+﻿@page "/cancelPayment"
+
+
+@inherits Login
+
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using Blazored.LocalStorage
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+@inject AppState _AppState
+@inject IJSRuntime JSRuntime
+@inject ILocalStorageService localStorage
+
+<PageTitle>CancelPayment</PageTitle>
+
+<h3>CancelPayment</h3>
+
+@code {
+    private string message;
+
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+
+        if (firstRender)
+        {
+            message = "Error,Your Payment Was Canceled, Please Login again!.";
+        
+        bool logout = await _apiServiceLogin.LogOutProcessAsync();
+        if (logout)
+        {
+            await localStorage.RemoveItemAsync("AYMauthToken");
+            Navigation.NavigateTo($"/login/{message}.");
+        }
+
+       }
+
+    }
+
+}

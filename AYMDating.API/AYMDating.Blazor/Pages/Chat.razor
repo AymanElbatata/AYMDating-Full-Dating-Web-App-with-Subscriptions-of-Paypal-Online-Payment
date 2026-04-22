@@ -1,0 +1,194 @@
+﻿@page "/chat"
+
+@if (_AppState.isAuthenticated)
+{
+@inherits Users
+
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.AspNetCore.Components
+@using Microsoft.JSInterop
+@inject AppState _AppState
+@inject ChatManagement _ChatManagement
+@inject ApiServiceLogin _apiServiceLogin
+
+<PageTitle>Chat</PageTitle>
+
+<style>
+    .message-list {
+        height: 380px; /* Set the desired fixed height */
+        overflow-y: scroll; /* Enable vertical scrolling */
+        list-style-type: none; /* Remove default list styling */
+        padding: 0; /* Remove default padding */
+        margin: 0; /* Remove default margin */
+    }
+
+    .message-item {
+        padding: 10px;
+        border-bottom: 1px solid #ddd; /* Optional: Add a border between items */
+    }
+</style>
+
+
+
+
+
+    <div class="m-2 col-md-12">
+        <div class="p-3 text-center">
+            @if (forecast != null)
+            {
+                            <div class="m-auto col-md-3 text-center p-2 fs-6">
+                    <div @onclick="() => NavigateToUser(forecast.AppUser.UserName)">
+                                <div class="p-1">
+                                    <img src="@GetImage(forecast.MainImage,(int)forecast.GenderId)" title="@forecast.AppUser.UserName" alt="Image" class="img-fluid w-75" style="border-radius: 15px;" />
+                                </div>
+                                <div>
+                                    @forecast.AppUser?.UserName |  <img src="@GetpackageImage((int)forecast.UserPackage.PackageId)" title="@forecast.UserPackage.Package.Name" class="img-fluid" style="max-width: 11%;" />
+                                </div>
+                                    <div class="d-flex align-items-center justify-content-center">
+                                        I'm Online &ensp; <img src="@GetUserOnlineLogo(forecast.IsCurrentUserOnline)" alt="@GetAltText(forecast.IsCurrentUserOnline)" class="img-fluid" style="max-width: 7%;" /> &ensp; <img src="css/Images/Default/UserVerified.png" alt="Verified" class="img-fluid" style="max-width: 7%;" />
+                                    </div>
+                                </div>
+
+
+                            </div>
+                       
+            }
+            else
+            {
+                <h6 style="color:blue">All Community</h6>
+                <h6>
+                    <img src="css/Images/Default/Community-1138-3145432481.png" alt="Image" title="General" class="img-fluid" style="border-radius: 15px; max-width: 15%;" />
+                </h6>
+            }
+        </div>
+        <ul class ="message-list">
+            @if (PreviousMessage!=null)
+            {
+                @foreach (var msg in PreviousMessage)
+                {
+                    <li class="message-item"><p style="color:blue">@GetDateTimeToStringDayMonthYear((DateTime) msg.CreationDate)|@msg.SenderAppUser.UserName:</p> @msg.Message</li>
+                }
+            }
+        @foreach (var msg in messages)
+        {
+                <li class="message-item"><p style="color:blue">@GetDateTimeToStringDayMonthYear((DateTime)msg.DateOfMaking)|@msg.User:</p> @msg.message</li>
+        }
+    </ul>
+</div>
+    <div class="py-4 col-md-12">
+        @if (!IsThereBlocking)
+        {
+            <input @bind="message" placeholder="Write Your message then Hit Enter" onkeyup="@CheckEnter" class="form-control" />
+        }
+        else
+        {
+            <p class="text-center text-danger">Sorry, There is Blocking</p>
+        }
+    </div>
+    <br />
+    <br />
+
+
+
+@code {
+    private UserHistoryDTO? forecast;
+
+    private bool IsThereBlocking = false;
+    private string GroupName;
+    private List<UserMessageDTO> PreviousMessage;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            hubConnection = new HubConnectionBuilder()
+                .WithUrl(Navigation.ToAbsoluteUri("/chathub"))
+                .Build();
+
+            hubConnection.On<string, string, DateTime, string>("ReceiveMessage", (user, userTo, dateOfMaking, message) =>
+            {
+                messages.Add(new Message { User = user, UserTo = userTo, DateOfMaking = dateOfMaking, message = message });
+                InvokeAsync(StateHasChanged);
+            });
+
+
+            await hubConnection.StartAsync();
+            if (!string.IsNullOrEmpty(_AppState.IMessageToUserId))
+            {
+                GroupName = await _apiServiceLogin.GetUserMessageGroupNameOrCreateItByUserId1ToUserId2(_AppState.IMessageToUserId);
+                PreviousMessage = await _apiServiceLogin.GetUserMessagesByUserIdandAnotherUser(new UserMessageDTO() { ReceiverAppUserId = _AppState.IMessageToUserId });
+                IsThereBlocking = await IsThereBlockingMethod();
+                await _ChatManagement.AddToGroup(hubConnection.ConnectionId, GroupName);
+                // forecast = await _apiServiceLogin.GetHistoryWithMainImageBytUserId(_AppState.IMessageToUserId);
+                forecast = _AppState.AllUsers.FirstOrDefault(a=>a.AppUserId ==_AppState.IMessageToUserId);
+            }
+
+        }
+        catch (Exception ex)
+        {
+            GoToWrongArea();
+        }
+
+    }
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        // if (firstRender && !string.IsNullOrEmpty(_AppState.IMessageToUserId))
+        // {
+        //     StateHasChanged();
+        // }
+        // StateHasChanged();
+    }
+
+    private void CheckEnter(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+        {
+            Send();
+        }
+    }
+
+    private async Task<bool> IsThereBlockingMethod()
+    {
+        return _AppState.IMessageToUserId != null ? await _apiServiceLogin.GetReturnIsThereBlockToThisUser(_AppState.IMessageToUserId) : false;
+    }
+
+    private async Task Send()
+    {
+        // userName1 = UserNameLogged;
+        // bool Blocking = await _apiServiceLogin.GetReturnIsThereBlockToThisUser(_AppState.IMessageToUserId);
+        if (await IsThereBlockingMethod())
+        {
+            IsThereBlocking = true;
+            StateHasChanged();
+        }
+
+        if (!string.IsNullOrEmpty(_AppState.CurrentUserHistoryDTO.AppUser.UserName) && !string.IsNullOrEmpty(_AppState.IMessageToUserId) && !string.IsNullOrEmpty(message))
+        {
+            UserMessageDTO SavedMessage =  await _apiServiceLogin.SendMessageFromCurrentUserToAnother(new UserMessageDTO() { ReceiverAppUserId = _AppState.IMessageToUserId, Message = message });
+            await _ChatManagement.SendMessage(GroupName, _AppState.CurrentUserHistoryDTO.AppUser.UserName, _AppState.IMessageToUserName, (DateTime)SavedMessage.CreationDate, SavedMessage.Message);
+        }
+        else
+            await hubConnection.SendAsync("SendMessage", _AppState.CurrentUserHistoryDTO.AppUser.UserName, _AppState.CurrentUserHistoryDTO.UserPackage.PackageId == 1 ? message.Substring(0, 5) + "....Free Membership" : message);
+
+        message = string.Empty;
+    }
+
+    public string GetDateTimeToStringDayMonthYear(DateTime date)
+    => date.ToString("dd-MM-yyyy, h:mm tt");
+
+    public void Dispose()
+    {
+        messages.Clear();
+        _AppState.IMessageToUserId = null;
+        _AppState.IMessageToUserName = null;
+        forecast = null;
+        InvokeAsync(StateHasChanged);
+    }
+
+}
+
+}
+else
+    UnAuthorizedUser();

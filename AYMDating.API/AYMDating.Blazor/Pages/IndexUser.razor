@@ -1,0 +1,30 @@
+﻿
+@page "/IndexUser"
+@if (_AppState.isAuthenticated)
+{
+@using AYMDating.Blazor.Data.Helpers
+@inherits Users
+
+@inject AppState _AppState
+
+
+<PageTitle>Find Your Perfect Match - AYM Dating</PageTitle>
+
+<p><em>Nothing to be viewed.</em></p>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        // Initialization code if needed
+
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        // Any after-render logic
+    }
+}
+
+}
+else
+    UnAuthorizedUser();

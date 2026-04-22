@@ -1,0 +1,248 @@
+﻿@page "/activateAccount/{Email?}/{Code?}"
+
+@inherits Login
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using AYMDating.DAL.Entities
+@using System.Net.Http.Headers
+@using System.ComponentModel.DataAnnotations
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+
+@* <PageTitle>Activate Account</PageTitle>
+
+
+<div class="container d-flex flex-column align-items-center justify-content-center">
+    <EditForm Model="activationModel" OnValidSubmit="HandleActivation">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+        <div class="text-center mb-1">
+            <label for="Email">Email:</label>
+            <InputText id="Email" @bind-Value="Email" type="email" />
+        </div>
+        <div class="text-center mb-1">
+            <label for="Code">Code:</label>
+            <InputText id="Code" @bind-Value="Code" type="text" />
+        </div>
+        <div class="text-center mb-1">
+            <button class="btn btn-outline-dark" type="submit">Activate</button>
+        </div>
+    </EditForm>
+</div> *@
+
+
+<PageTitle>Activate Account</PageTitle>
+
+<style>
+    :root {
+        --primary-color: #6c5ce7;
+        --secondary-color: #a29bfe;
+        --light-color: #f8f9fa;
+        --dark-color: #343a40;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        --transition: all 0.3s ease;
+    }
+
+    .activation-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 80vh;
+        padding: 2rem;
+    }
+
+    .activation-card {
+        width: 100%;
+        max-width: 450px;
+        padding: 2.5rem;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        text-align: center;
+    }
+
+    .activation-header {
+        margin-bottom: 2rem;
+    }
+
+    .activation-title {
+        color: var(--primary-color);
+        font-size: 1.8rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .activation-subtitle {
+        color: #6c757d;
+        font-size: 1rem;
+    }
+
+    .activation-form {
+        width: 100%;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--dark-color);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 1px solid #ced4da;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 0.2rem rgba(108, 92, 231, 0.25);
+        }
+
+    .activation-btn {
+        width: 100%;
+        padding: 0.75rem;
+        background-color: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: var(--transition);
+        margin-top: 1rem;
+    }
+
+        .activation-btn:hover {
+            background-color: #5649d2;
+            transform: translateY(-2px);
+        }
+
+    .validation-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        text-align: left;
+    }
+
+    .validation-summary {
+        color: #dc3545;
+        background-color: #f8d7da;
+        border: 1px solid #f5c6cb;
+        border-radius: var(--border-radius);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+        text-align: left;
+    }
+
+    @@media (max-width: 576px) {
+        .activation-card {
+            padding: 1.5rem;
+        }
+
+        .activation-title {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<div class="activation-container">
+    <div class="activation-card">
+        <div class="activation-header">
+            <h1 class="activation-title">Account Activation</h1>
+            <p class="activation-subtitle">Enter your email and activation code to verify your account</p>
+        </div>
+
+        <EditForm Model="activationModel" OnValidSubmit="HandleActivation" class="activation-form">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="validation-summary" />
+
+            <div class="form-group">
+                <label for="Email" class="form-label">Email Address</label>
+                <InputText id="Email" @bind-Value="activationModel.Email" class="form-control"
+                           placeholder="your@email.com" />
+                <ValidationMessage For="@(() => activationModel.Email)" class="validation-message" />
+            </div>
+
+            <div class="form-group">
+                <label for="Code" class="form-label">Activation Code</label>
+                <InputText id="Code" @bind-Value="activationModel.Code" class="form-control"
+                           placeholder="Enter 6-digit code" />
+                <ValidationMessage For="@(() => activationModel.Code)" class="validation-message" />
+            </div>
+
+            <button type="submit" class="activation-btn">
+                <i class="fas fa-check-circle me-2"></i> Activate Account
+            </button>
+        </EditForm>
+    </div>
+</div>
+
+
+
+
+
+@code {
+
+    [Parameter]
+    [Required]
+    [EmailAddress]
+    public string? Email { get; set; }
+
+    [Parameter]
+    [MinLength(10)]
+    [MaxLength(10)]
+    public string? Code { get; set; }
+
+    private ActivateUserDTO activationModel = new ActivateUserDTO();
+
+    private async Task HandleActivation()
+    {
+        try
+        {
+            activationModel.Code = Code;
+            bool ActivateUserIsDone = await _apiServiceLogin.VerifyActivateUser(activationModel);
+            if (ActivateUserIsDone)
+            {
+                Navigation.NavigateTo("/login/Congratulation, Your Account Is Activated Now.");
+            }
+            else
+            {
+                await ShowAlert("Code Cannot be Empty!.");
+            }
+
+        }
+        catch (Exception ex)
+        {
+            // Handle login failure (e.g., show an error message)
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        activationModel.Email = Email;
+        if (activationModel.Code != null)
+        {
+            activationModel.Code = Code;
+        }
+    }
+
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        // if (firstRender)
+        // {
+        // }
+    }
+}

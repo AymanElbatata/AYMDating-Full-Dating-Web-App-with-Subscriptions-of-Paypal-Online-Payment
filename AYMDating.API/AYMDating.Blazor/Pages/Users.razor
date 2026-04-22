@@ -1,0 +1,284 @@
+﻿@page "/users"
+@if (_AppState.isAuthenticated)
+{
+@inherits Login
+@using AYMDating.API.DTO
+@using AYMDating.API.Helpers
+@using AYMDating.Blazor.Data.Helpers
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+@inject AppState _AppState
+
+<PageTitle>Users</PageTitle>
+
+
+    <h1>Users</h1>
+    <br />
+
+    @if (forecasts == null )
+    {
+        <p><em>Loading...</em></p>
+    }
+    else if (forecasts.Where(a => a.AppUserId != _AppState.CurrentUserHistoryDTO.AppUserId && a.GenderId != _AppState.CurrentUserHistoryDTO.GenderId).Count() == 0)
+    {
+        <p><em>No Users.</em></p>
+    }
+    else
+    {
+        <div class="container">
+            <div class="row">
+                @foreach (var forecast in forecasts.Where(a => a.AppUserId != _AppState.CurrentUserHistoryDTO.AppUserId && a.GenderId != _AppState.CurrentUserHistoryDTO.GenderId))
+                {
+                  <div class="col-md-3 text-center p-2 fs-6">
+                        <div class="border border-black rounded" @onclick="() => NavigateToUser(forecast.AppUser.UserName)">
+                        <div class="p-1">
+                                <img src="@GetImage(forecast.MainImage,(int)forecast.GenderId)" title="@forecast.AppUser.UserName" alt="Image" class="img-fluid rounded" />
+                        </div>
+                        <div>
+                            @forecast.AppUser?.UserName |  <img src="@GetpackageImage((int)forecast.UserPackage.PackageId)" title="@forecast.UserPackage.Package.Name" class="img-fluid" style="max-width: 11%;" />
+                        </div>
+                        <div>
+                            @forecast.Age | @forecast.Country?.Name | @forecast.City
+                        </div>
+                        <div>
+                            Seeking: @GetGender((int)forecast.GenderId) @forecast.SearchAgeFrom - @forecast.SearchAgeTo
+                        </div>
+                        <div class="d-flex align-items-center justify-content-center">
+                                I'm Online &ensp; <img src="@GetUserOnlineLogo(forecast.IsCurrentUserOnline)" alt="@GetAltText(forecast.IsCurrentUserOnline)" class="img-fluid" style="max-width: 7%;" /> &ensp; <img src=@GetUserVerifiedLogo(forecast.IsCurrentUserVerified) title="@(forecast.IsCurrentUserVerified?"Verified":"Unverified")" alt="Verified" class="img-fluid" style="max-width: 7%;" />
+                        </div>
+                        <div>
+                           Joined Since:  @GetUserSinceDateOfJoin(forecast.AppUser.DateOfJoin)
+                        </div>
+                     </div>
+
+                        <div class="d-flex align-items-center justify-content-between p-3">
+                            <img src="@GetUserIsLiked(forecast.IsLikedFromCurrentUser)" alt="Add Like" title="Add Like to this User" class="img-fluid" style="max-width: 20%;" @onclick="() => AddRemoveLike(forecast.AppUserId,forecast.IsLikedFromCurrentUser)" /> || <img src="@GetUserIsFavorite(forecast.IsFavoriteFromCurrentUser)" alt="Add Favorite" title="Add this User To Your Favorites" class="img-fluid" style="max-width: 20%;" @onclick="() => AddRemoveFavorite(forecast.AppUserId,forecast.IsFavoriteFromCurrentUser)" /> || <img src="css/Images/Default/message-icon.png" alt="Messaging" title="Message this User" class="img-fluid" style="max-width: 20%;" @onclick="() => GoToChatWith(forecast.AppUser.UserName, forecast.AppUserId)" /> || <img src="@GetUserIsBlocked(forecast.IsBlockedFromCurrentUser)" alt="Blocking" title="Block Or Unblock This User" class="img-fluid" style="max-width: 20%;" @onclick="() => AddRemoveBlocking(forecast.AppUserId,forecast.IsBlockedFromCurrentUser)" />
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+
+
+
+
+    @code {
+
+
+    protected List<UserHistoryDTO>? forecasts;
+
+    protected UserViewOrLikeOrFavoriteOrBlockOrReportDTO model = new UserViewOrLikeOrFavoriteOrBlockOrReportDTO();
+
+    protected string GetUserSinceDateOfJoin(DateTime dateOfJoin)
+    {
+        int Days = DateOnly.FromDateTime(DateTime.Now).DayNumber - DateOnly.FromDateTime(dateOfJoin).DayNumber;
+        if (Days > 0)
+            return Days.ToString() + " day";
+        else
+            return "Today";
+    }
+    protected string GetUserImage(string ImgUrl)
+    {
+        // return !string.IsNullOrEmpty(ImgUrl) ? "UserImages/" + ImgUrl.Replace("https://localhost:7082/", "") : "css/Images/Default/user-icon-2400.png";
+        return !string.IsNullOrEmpty(ImgUrl) ? UserImagesUrlSpecs.UrlUserImagestoRead + ImgUrl.Replace("https://aymdate.runasp.net/", "") : "css/Images/Default/user-icon-2400.png";
+    }
+    // protected async Task Update_AppStateCurrentUser()
+    // {
+    //     _AppState.CurrentUser = await _apiServiceLogin.GetHistoryWithMainImageBytUserId(_AppState.CurrentUserId);
+    //     _AppState.TotalCounter = _AppState.CurrentUser.CounterOfNewLikes + _AppState.CurrentUser.CounterOfNewFavorites + _AppState.CurrentUser.CounterOfNewViews + _AppState.CurrentUser.CounterOfNewBlocks;
+    // }
+
+
+    protected string GetUserIsLiked(bool isUserIsLiked)
+    {
+        return !isUserIsLiked ? "css/Images/Default/LikeHeart01.png" : "css/Images/Default/LikeHeart02.png";
+    }
+
+    protected string GetUserIsFavorite(bool isUserIsFavorited)
+    {
+        return !isUserIsFavorited ? "css/Images/Default/favorite01.png" : "css/Images/Default/favorite02.png";
+    }
+
+    protected string GetUserIsBlocked(bool isUserIsFavorited)
+    {
+        return !isUserIsFavorited ? "css/Images/Default/Blocking2.png" : "css/Images/Default/Blocking1.png";
+    }
+
+    protected string GetUserOnlineLogo(bool isUserOnlineLogo)
+    {
+        return isUserOnlineLogo ? "css/Images/Default/UserOnline.png" : "css/Images/Default/UserOffline.png";
+    }
+
+    protected string GetUserVerifiedLogo(bool isUsererifiedLogo)
+    {
+        return isUsererifiedLogo ? "css/Images/Default/UserVerified.png" : "css/Images/Default/UserNotVerified.png";
+    }
+
+    protected string GetAltText(bool isOnline)
+    {
+        return isOnline ? "Online" : "Offline";
+    }
+
+    protected string GetImage(string ImgUrl, int GenderType)
+    {
+        if (string.IsNullOrEmpty(ImgUrl))
+            return GenderType == 1 ? "css/Images/Default/BoyPhoto1.jpg" : "css/Images/Default/GirlPhoto1.png";
+        else
+            // return "UserImages/" + ImgUrl.Replace("https://localhost:7082/", "");
+            return UserImagesUrlSpecs.UrlUserImagestoRead + ImgUrl.Replace("https://aymdate.runasp.net/", "");
+    }
+
+    protected string GetGender(int genderId)
+    {
+        return genderId == 1 ? "Female" : "Male";
+    }
+
+    protected void NavigateToUser(string Username)
+    {
+        Navigation.NavigateTo($"/userDetails/{Username}");
+    }
+
+    protected async Task GoToChatWith(string SecondUserName, string SecondToUserId)
+    {
+        if (SecondToUserId!=_AppState.CurrentUserHistoryDTO.AppUserId)
+        {
+            bool CheckIfBlocking = await _apiServiceLogin.GetReturnIsThereBlockToThisUser(SecondToUserId);
+            if (!CheckIfBlocking)
+            {
+                _AppState.IMessageToUserName = SecondUserName;
+                _AppState.IMessageToUserId = SecondToUserId;
+                Navigation.NavigateTo("/chat");
+            }
+            else
+                await ShowAlert("Sorry, There is Blocking!");
+        }
+        else
+            await ShowAlert("Sorry, You Can't Message This Person!");
+    }
+
+
+
+    protected async void AddReport(string RecieverID)
+    {
+        if (forecasts == null)
+        {
+            forecasts = _AppState.AllUsers;
+        }
+        if (RecieverID == _AppState.CurrentUserHistoryDTO.AppUserId)
+        {
+            await ShowAlert("Sorry, You Can't Report YourSelf!");
+        }
+        model.ReceiverAppUserId = RecieverID;
+        var Result = await _apiServiceLogin.SendReportFromCurrentUserToAnother(model);
+        if (Result)
+            await ShowAlert("Thanks, We Will investigate this User!");
+        else
+            await ShowAlert("Sorry, You Couldn't Report This User!");
+    }
+
+    protected async void AddRemoveLike(string RecieverID, bool isUserIsLiked)
+    {
+        if (forecasts == null)
+        {
+            forecasts = _AppState.AllUsers;
+        }
+        if (!isUserIsLiked)
+        {
+            model.ReceiverAppUserId = RecieverID;
+            var Result = await _apiServiceLogin.SendLikeFromCurrentUserToAnother(model);
+            if (Result)
+            {
+                forecasts.Where(a => a.AppUserId == RecieverID).SingleOrDefault().IsLikedFromCurrentUser = true;
+                StateHasChanged();
+            }
+        }
+        else
+            await ShowAlert("You Already Liked before!");
+    }
+
+
+
+    protected async void AddRemoveBlocking(string RecieverID, bool isUserIsBlocked)
+    {
+        if (forecasts == null)
+        {
+            forecasts = _AppState.AllUsers;
+        }
+        model.ReceiverAppUserId = RecieverID;
+        if (model.ReceiverAppUserId == RecieverID ){
+            await ShowAlert("You Can't Block this Person!");
+        }
+        else
+        {
+            if (!isUserIsBlocked)
+            {
+                var Result = await _apiServiceLogin.SendBlockFromCurrentUserToAnother(model);
+                if (Result)
+                    forecasts.Where(a => a.AppUserId == RecieverID).SingleOrDefault().IsBlockedFromCurrentUser = true;
+            }
+            else
+            {
+                var Result = await _apiServiceLogin.DeleteBlockFromCurrentUserToAnother(model);
+                if (Result)
+                    forecasts.Where(a => a.AppUserId == RecieverID).SingleOrDefault().IsBlockedFromCurrentUser = false;
+            }           
+        }
+
+
+        StateHasChanged();
+    }
+
+
+    
+
+    protected async void AddRemoveFavorite(string RecieverID, bool isUserIsFavorite)
+    {
+        if (forecasts == null)
+        {
+            forecasts = _AppState.AllUsers;
+        }
+        model.ReceiverAppUserId = RecieverID;
+        var Result = await _apiServiceLogin.SendFavoriteCurrentFromUserToAnother(model);
+        if (Result)
+        {
+            if (!isUserIsFavorite)
+                forecasts.Where(a => a.AppUserId == RecieverID).SingleOrDefault().IsFavoriteFromCurrentUser = true;
+            else
+                forecasts.Where(a => a.AppUserId == RecieverID).SingleOrDefault().IsFavoriteFromCurrentUser = false;
+        }
+        StateHasChanged();
+    }
+    public string GetUserAge(DateTime date)
+    {
+        var Age = DateTime.Now.Year - date.Year;
+        return Age.ToString();
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // forecasts = await _apiServiceLogin.GetHistoryWithMainImagesForAll();
+            forecasts = _AppState.AllUsers;
+        }
+        catch (Exception ex)
+        {
+            GoToWrongArea();
+        }
+    }
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+        // if (firstRender)
+        // {
+        //     StateHasChanged();
+        // }
+
+    }
+
+
+}
+
+}
+else
+    UnAuthorizedUser();

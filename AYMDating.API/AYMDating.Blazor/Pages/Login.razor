@@ -1,0 +1,1259 @@
+﻿@page "/login/{Message?}"
+@inherits MainLayout
+@using AYMDating.API.DTO
+@using AYMDating.Blazor.Data.Helpers
+@using Blazored.LocalStorage
+@using System.Net.Http.Headers
+@using System.ComponentModel.DataAnnotations
+@inject ILocalStorageService localStorage
+@inject NavigationManager Navigation
+@inject ApiServiceLogin _apiServiceLogin
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject AppState _AppState
+@inject JsInteropService JsInterop
+
+
+@* <PageTitle>Login</PageTitle>
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    if (Message.Contains("Error"))
+    {
+        <p style="color:red">@Message</p>
+    }
+    else
+    {
+        <p style="color:green">@Message</p>
+    }
+}    
+
+<div class="container d-flex flex-column align-items-center justify-content-center">
+    <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+
+        <div class="text-center mb-1">
+            <label for="loginModel.Email">Email:</label>
+            <InputText id="Email" @bind-Value="loginModel.Email" type="email" />
+        </div>
+        <div class="text-center mb-1">
+            <label for="loginModel.Password">Password:</label>
+            <InputText id="Password" @bind-Value="loginModel.Password" type="password" />
+        </div>
+        <div class="form-check text-center mb-1">
+            <InputCheckbox id="loginModel.RememberMe" @bind-Value="loginModel.RememberMe" class="form-check-input" />
+            <label for="loginModel.RememberMe">RememberMe:</label>
+    </div>
+        <div class="text-center mb-1">
+            <button class="btn btn-outline-dark" type="submit">Login</button>
+        </div>
+    </EditForm>
+    @if (_isHuman)
+    {
+        <p>Thank you for verifying!</p>
+    }
+    else
+    {
+        <div class="mt-1 mb-1 d-flex flex-column border border-black rounded justify-content-between align-items-center">
+        <p>Solve the following problem to prove you're not a robot:</p>
+        <p>@_num1 + @_num2 = ?</p>
+        <input @bind="_userAnswer" placeholder="Your Answer" class="mb-1" type="text" />
+        <button class="btn btn-outline-secondary" @onclick="VerifyCaptcha">Verify</button>
+        </div>
+    }
+</div>
+<ul style="list-style-type:none">
+ <li><NavLink href="forgotPassword">Forgot Password</NavLink></li>
+ <li><NavLink href="activateAcAgain">Activation</NavLink></li>
+    <li><NavLink href="SwitchedOnAccountAgain">Switch On Again</NavLink></li>
+</ul>
+@if (isLoading)
+{
+    <div class="container d-flex flex-column align-items-center justify-content-center">
+        <div class="loader text-center">
+            <div class="loader-text"> <img src="css/Images/Default/reload-loading-process-blue-round-512-3569811198.png" class="img-fluid" style="max-width: 80%;" /> </div>
+        </div>
+
+   </div>
+} *@
+
+@* <PageTitle>Login to Find Your Match - AYM Dating</PageTitle>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-header">
+            <img src="css/Images/Default/love-facebook-cover-170149232.jpg" alt="AYM Dating Logo" class="logo" />
+            <h2>Welcome Back</h2>
+            <p>Continue your journey to find love</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Message))
+        {
+            <div class="alert @(Message.Contains("Error") ? "alert-error" : "alert-success")">
+                <i class="fas @(Message.Contains("Error") ? "fa-exclamation-circle" : "fa-check-circle")"></i>
+                @Message
+            </div>
+        }
+
+        <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="validation-summary" />
+
+            <div class="form-group">
+                <label for="loginModel.Email">Email Address</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-envelope"></i>
+                    <InputText id="Email" @bind-Value="loginModel.Email" type="email" class="form-control" placeholder="Enter your email" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="loginModel.Password">Password</label>
+                <div class="input-with-icon">
+                    <i class="fas fa-lock"></i>
+                    <InputText id="Password" @bind-Value="loginModel.Password"
+                               type="@(showPassword ? "text" : "password")"
+                               class="form-control"
+                               placeholder="Enter your password" />
+                    <button type="button" class="toggle-password"
+                            @onclick="TogglePasswordVisibility"
+                    @onclick:stopPropagation>
+                        <i class="fas @(showPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div class="form-group remember-me">
+                <InputCheckbox id="loginModel.RememberMe" @bind-Value="loginModel.RememberMe" class="form-check-input" />
+                <label for="loginModel.RememberMe">Remember me</label>
+            </div>
+
+            @if (!_isHuman)
+            {
+                <div class="captcha-box">
+                    <p>Please verify you're not a robot</p>
+                    <div class="captcha-challenge">
+                        <span>@_num1 + @_num2 = ?</span>
+                        <div class="captcha-input">
+                            <input @bind="_userAnswer" placeholder="Your answer" type="text" />
+                            <button type="button" class="btn-verify" @onclick="VerifyCaptcha">
+                                <i class="fas fa-check"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+            else
+            {
+                <div class="verification-success">
+                    <i class="fas fa-check-circle"></i>
+                    <span>Verification complete!</span>
+                </div>
+            }
+            <button class="btn-login" type="submit" disabled="@isLoading">
+                @if (isLoading)
+                {
+                    <span class="spinner"></span>
+                    <span>Sending...</span>
+                }
+                else
+                {
+                    <span>Send Message</span>
+                    <i class="fas fa-paper-plane"></i>
+                }
+            </button>
+        </EditForm>
+
+
+
+        <div class="login-footer">
+            <NavLink href="forgotPassword" class="footer-link">
+                <i class="fas fa-key"></i> Forgot Password?
+            </NavLink>
+            <NavLink href="activateAcAgain" class="footer-link">
+                <i class="fas fa-envelope"></i> Resend Activation
+            </NavLink>
+            <NavLink href="SwitchedOnAccountAgain" class="footer-link">
+                <i class="fas fa-power-off"></i> Reactivate Account
+            </NavLink>
+            <div class="signup-link">
+                Don't have an account? <NavLink href="/register">Sign up</NavLink>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #ff6b8b;
+        --secondary-color: #ff8e53;
+        --error-color: #ff4757;
+        --success-color: #2ed573;
+        --text-color: #333;
+        --light-gray: #f5f5f5;
+        --border-color: #e0e0e0;
+    }
+
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: #f8f9fa;
+        padding: 1rem;
+    }
+
+    .login-card {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 500px;
+        padding: 10px;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+
+        .login-header .logo {
+            height: 60px;
+            margin-bottom: 1rem;
+        }
+
+        .login-header h2 {
+            color: var(--primary-color);
+            margin-bottom: 0.5rem;
+        }
+
+        .login-header p {
+            color: #666;
+            margin: 0;
+        }
+
+    .alert {
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .alert-error {
+        background-color: #ffebee;
+        color: var(--error-color);
+        border-left: 4px solid var(--error-color);
+    }
+
+    .alert-success {
+        background-color: #e8f5e9;
+        color: var(--success-color);
+        border-left: 4px solid var(--success-color);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-color);
+        }
+
+    .input-with-icon {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+        .input-with-icon i {
+            position: absolute;
+            left: 15px;
+            color: #999;
+        }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(255,107,139,0.2);
+            outline: none;
+        }
+
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        background: none;
+        border: none;
+        color: #999;
+        cursor: pointer;
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+        .remember-me label {
+            margin-bottom: 0;
+            margin-left: 0.5rem;
+            cursor: pointer;
+        }
+
+    .btn-login {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+        .btn-login:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 107, 139, 0.3);
+        }
+
+        .btn-login:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+    .captcha-box {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: var(--light-gray);
+        border-radius: 6px;
+        text-align: center;
+    }
+
+        .captcha-box p {
+            margin: 0 0 1rem;
+            color: #666;
+        }
+
+    .captcha-challenge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+        .captcha-challenge span {
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+
+    .captcha-input {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+        .captcha-input input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            width: 80px;
+            text-align: center;
+        }
+
+    .btn-verify {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+    }
+
+    .verification-success {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: var(--success-color);
+        margin: 1.5rem 0;
+    }
+
+    .login-footer {
+        margin-top: 2rem;
+        border-top: 1px solid var(--border-color);
+        padding-top: 1.5rem;
+    }
+
+    .footer-link {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #666;
+        text-decoration: none;
+        margin-bottom: 0.75rem;
+        transition: color 0.2s ease;
+    }
+
+        .footer-link:hover {
+            color: var(--primary-color);
+        }
+
+    .signup-link {
+        margin-top: 1rem;
+        text-align: center;
+        color: #666;
+    }
+
+        .signup-link a {
+            color: var(--primary-color);
+            font-weight: 500;
+            text-decoration: none;
+        }
+
+    .validation-summary {
+        color: var(--error-color);
+        background-color: #ffebee;
+        border-left: 4px solid var(--error-color);
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        list-style: none;
+    }
+
+    @@media (max-width: 576px) {
+        .login-container {
+            padding: 1rem;
+        }
+
+        .login-card {
+            padding: 1.5rem;
+        }
+
+        .captcha-challenge {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+ *@
+
+ <PageTitle>Login to Find Your Match - AYM Dating</PageTitle>
+
+<div class="login-container">
+    <div class="login-card">
+        <div class="login-hero">
+            <img src="css/Images/Default/love-facebook-cover-170149232.jpg" alt="Couple in love" class="hero-image" />
+            <div class="hero-overlay">
+                <h1>Find Your Perfect Match</h1>
+                <p>Join thousands of happy couples who found love through AYM Dating</p>
+            </div>
+        </div>
+
+        <div class="login-form">
+            <div class="login-header">
+                <h2>Welcome Back</h2>
+                <p>Continue your journey to find love</p>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Message))
+            {
+                <div class="alert @(Message.Contains("Error") ? "alert-error" : "alert-success")">
+                    <i class="fas @(Message.Contains("Error") ? "fa-exclamation-circle" : "fa-check-circle")"></i>
+                    @Message
+                </div>
+            }
+
+            <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+                <DataAnnotationsValidator />
+                <ValidationSummary class="validation-summary" />
+
+                <div class="form-group">
+                    <label for="loginModel.Email">Email Address</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-envelope"></i>
+                        <InputText id="Email" @bind-Value="loginModel.Email" type="email" 
+                                  class="form-control" placeholder="Enter your email" />
+                    </div>
+                </div>
+
+@*                 <div class="form-group">
+                    <label for="loginModel.Password">Password</label>
+                    <div class="input-with-icon">
+                        <i class="fas fa-lock"></i>
+                        <InputText id="Password" @bind-Value="loginModel.Password"
+                                   type="@(showPassword ? "text" : "password")"
+                                   class="form-control"
+                                   placeholder="Enter your password" />
+                        <button type="button" class="toggle-password"
+                                @onclick="TogglePasswordVisibility"
+                                @onclick:stopPropagation>
+                            <i class="fas @(showPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                        </button>
+                    </div>
+                </div> *@
+
+@*                 <div class="form-group">
+                    <label>Password</label>
+                    <div class="password-input">
+                        <InputText id="Password" @bind-Value="loginModel.Password"
+                                   type="@(showPassword ? "text" : "password")"
+                                   class="form-control"
+                                   placeholder="Enter your password" />
+                        <button type="button" class="toggle-password" @onclick="TogglePasswordVisibility">
+                            <i class="fas @(showPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                        </button>
+                    </div>
+                </div> *@
+
+
+                <div class="form-group">
+                    <label for="loginModel.Password">Password</label>
+                    <div class="password-input-container">
+                        <i class="fas fa-lock input-icon"></i>
+                        <InputText id="Password"
+                                   @bind-Value="loginModel.Password"
+                                   type="@(showPassword ? "text" : "password")"
+                                   class="form-control password-input"
+                                   placeholder="Enter your password" />
+                        <button type="button"
+                                class="password-toggle"
+                                @onclick="TogglePasswordVisibility"
+                        @onclick:stopPropagation
+                                aria-label="@(showPassword ? "Hide password" : "Show password")">
+                            <span class="toggle-text">@(showPassword ? "Hide" : "Show")</span>
+                            <i class="fas @(showPassword ? "fa-eye-slash" : "fa-eye")"></i>
+                        </button>
+                    </div>
+                </div>
+
+
+                <div class="form-options">
+                    <div class="remember-me">
+                        <InputCheckbox id="loginModel.RememberMe" @bind-Value="loginModel.RememberMe" 
+                                      class="form-check-input" />
+                        <label for="loginModel.RememberMe">Remember me</label>
+                    </div>
+                    <NavLink href="forgotPassword" class="forgot-password">
+                        Forgot password?
+                    </NavLink>
+                </div>
+
+                @if (!_isHuman)
+                {
+                    <div class="captcha-box">
+                        <p>Please verify you're not a robot</p>
+                        <div class="captcha-challenge">
+                            <span>@_num1 + @_num2 = ?</span>
+                            <div class="captcha-input">
+                                <input @bind="_userAnswer" placeholder="Your answer" type="text" />
+                                <button type="button" class="btn-verify" @onclick="VerifyCaptcha">
+                                    <i class="fas fa-check"></i> Verify
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="verification-success">
+                        <i class="fas fa-check-circle"></i>
+                        <span>Verification complete!</span>
+                    </div>
+                }
+
+                <button class="btn-login" type="submit" disabled="@isLoading">
+                    @if (isLoading)
+                    {
+                        <span class="spinner"></span>
+                        <span>Logging in...</span>
+                    }
+                    else
+                    {
+                        <span>Login</span>
+                        <i class="fas fa-arrow-right"></i>
+                    }
+                </button>
+            </EditForm>
+
+            <div class="login-divider">
+                <span>or</span>
+            </div>
+
+@*             <div class="social-login">
+                <button class="btn-social google">
+                    <i class="fab fa-google"></i> Continue with Google
+                </button>
+                <button class="btn-social facebook">
+                    <i class="fab fa-facebook-f"></i> Continue with Facebook
+                </button>
+            </div> *@
+
+            <div class="signup-link">
+                Don't have an account? <NavLink href="/register">Sign up now</NavLink>
+            </div>
+            <div class="signup-link">
+                Forgot Password? <NavLink href="/forgotPassword">Forgot Password now</NavLink>
+            </div>
+             <div class="signup-link">
+                Resend Activation? <NavLink href="/activateAcAgain">Resend Activation now</NavLink>
+            </div>
+            <div class="signup-link">
+                Reactivate Account? <NavLink href="/SwitchedOnAccountAgain">Reactivate Account now</NavLink>
+            </div>
+
+
+        </div>
+    </div>
+</div>
+
+<style>
+    :root {
+        --primary-color: #ff6b8b;
+        --secondary-color: #ff8e53;
+        --error-color: #ff4757;
+        --success-color: #2ed573;
+        --text-color: #333;
+        --light-gray: #f5f5f5;
+        --border-color: #e0e0e0;
+    }
+
+    .login-container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: #f8f9fa;
+        padding: 1rem;
+    }
+
+    .login-card {
+        display: flex;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        width: 100%;
+        max-width: 900px;
+        overflow: hidden;
+    }
+
+    .login-hero {
+        flex: 1;
+        position: relative;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    }
+
+    .hero-image {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0.8;
+    }
+
+    .hero-overlay {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        padding: 2rem;
+        color: white;
+        background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    }
+
+    .hero-overlay h1 {
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .hero-overlay p {
+        margin: 0;
+        opacity: 0.9;
+    }
+
+    .login-form {
+        flex: 1;
+        padding: 2.5rem;
+        max-width: 450px;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .login-header h2 {
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .login-header p {
+        color: #666;
+        margin: 0;
+    }
+
+    .alert {
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .alert-error {
+        background-color: #ffebee;
+        color: var(--error-color);
+        border-left: 4px solid var(--error-color);
+    }
+
+    .alert-success {
+        background-color: #e8f5e9;
+        color: var(--success-color);
+        border-left: 4px solid var(--success-color);
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-color);
+    }
+
+    .input-with-icon {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-with-icon i {
+        position: absolute;
+        left: 15px;
+        color: #999;
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(255,107,139,0.2);
+        outline: none;
+    }
+/* 
+    .toggle-password {
+        position: absolute;
+        right: 15px;
+        background: none;
+        border: none;
+        color: #999;
+        cursor: pointer;
+    } */
+  /*   .password-input {
+        position: relative;
+    }
+
+    .toggle-password {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #6c757d;
+        cursor: pointer;
+    } */
+
+
+
+    .password-input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .input-icon {
+        position: absolute;
+        left: 15px;
+        color: #999;
+        z-index: 2;
+    }
+
+    .password-input {
+        width: 100%;
+        padding: 12px 15px 12px 45px;
+        padding-right: 100px; /* Space for toggle button */
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+
+        .password-input:focus {
+            border-color: #ff6b8b;
+            box-shadow: 0 0 0 3px rgba(255,107,139,0.2);
+            outline: none;
+        }
+
+    .password-toggle {
+        position: absolute;
+        right: 10px;
+        background: none;
+        border: none;
+        color: #666;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        padding: 5px 8px;
+        border-radius: 4px;
+        transition: all 0.2s ease;
+    }
+
+        .password-toggle:hover {
+            background-color: #f0f0f0;
+            color: #333;
+        }
+
+    .toggle-text {
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    @@media (max-width: 576px) {
+        .toggle-text {
+            display: none;
+        }
+
+        .password-input {
+            padding-right: 45px;
+        }
+    }
+
+
+
+
+    .form-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+    }
+
+    .remember-me label {
+        margin-left: 0.5rem;
+        cursor: pointer;
+    }
+
+    .forgot-password {
+        color: var(--primary-color);
+        text-decoration: none;
+        font-size: 0.9rem;
+    }
+
+    .btn-login {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-weight: 500;
+        font-size: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+
+    .btn-login:hover {
+        opacity: 0.9;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(255, 107, 139, 0.3);
+    }
+
+    .btn-login:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+
+    .spinner {
+        width: 18px;
+        height: 18px;
+        border: 3px solid rgba(255,255,255,0.3);
+        border-radius: 50%;
+        border-top-color: white;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @@keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    .captcha-box {
+        margin: 1.5rem 0;
+        padding: 1rem;
+        background: var(--light-gray);
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    .captcha-box p {
+        margin: 0 0 1rem;
+        color: #666;
+    }
+
+    .captcha-challenge {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+    }
+
+    .captcha-challenge span {
+        font-weight: bold;
+        font-size: 1.2rem;
+    }
+
+    .captcha-input {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .captcha-input input {
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        width: 80px;
+        text-align: center;
+    }
+
+    .btn-verify {
+        background: var(--primary-color);
+        color: white;
+        border: none;
+        border-radius: 4px;
+        padding: 8px 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 5px;
+        cursor: pointer;
+    }
+
+    .verification-success {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: var(--success-color);
+        margin: 1.5rem 0;
+    }
+
+    .login-divider {
+        display: flex;
+        align-items: center;
+        margin: 1.5rem 0;
+        color: #999;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+        content: "";
+        flex: 1;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .login-divider span {
+        padding: 0 1rem;
+    }
+
+    .social-login {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .btn-social {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    .btn-social:hover {
+        background: var(--light-gray);
+    }
+
+    .btn-social.google {
+        color: #db4437;
+    }
+
+    .btn-social.facebook {
+        color: #4267B2;
+    }
+
+    .signup-link {
+        text-align: center;
+        color: #666;
+    }
+
+    .signup-link a {
+        color: var(--primary-color);
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .validation-summary {
+        color: var(--error-color);
+        background-color: #ffebee;
+        border-left: 4px solid var(--error-color);
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        margin-bottom: 1.5rem;
+        list-style: none;
+    }
+
+    @@media (max-width: 768px) {
+        .login-card {
+            flex-direction: column;
+        }
+
+        .login-hero {
+            display: none;
+        }
+
+        .login-form {
+            max-width: 100%;
+            padding: 1.5rem;
+        }
+
+        .captcha-challenge {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+
+
+@code {
+    [Parameter]
+    public string? Message { get; set; }
+
+    private bool showPassword = false;
+
+
+    private int _num1;
+    private int _num2;
+    private string _userAnswer;
+    private bool _isHuman;
+
+    private void TogglePasswordVisibility()
+    {
+        showPassword = !showPassword;
+    }
+    protected override void OnInitialized()
+    {
+        GenerateCaptcha();
+    }
+
+    private void GenerateCaptcha()
+    {
+        var random = new Random();
+        _num1 = random.Next(1, 10);
+        _num2 = random.Next(1, 10);
+    }
+
+    private void VerifyCaptcha()
+    {
+        int correctAnswer = _num1 + _num2;
+        _isHuman = _userAnswer == correctAnswer.ToString();
+    }
+
+
+
+    protected bool isLoading = false;
+
+    protected void UnAuthorizedUser()
+    {
+        try
+        {
+            Navigation.NavigateTo("/login");
+        }
+        catch (NavigationException ex)
+        {
+            ShowAlert("Error: " + ex.Message);
+        }
+    }
+
+    protected void GoToWrongArea()
+    {
+        try
+        {
+            Navigation.NavigateTo("/");
+        }
+        catch (NavigationException ex)
+        {
+            ShowAlert("Error: " + ex.Message);
+        }
+    }
+
+    protected async Task ShowAlert(string message)
+    {
+        await JsInterop.ShowAlert(message);
+    }
+
+    private LoginModel loginModel = new LoginModel();
+
+
+    public class LoginModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+        [Required]
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\S)[a-zA-Z\S]{8,100}$", ErrorMessage = "Password Must contain one upper letter and one lower letter.")]
+        public string Password { get; set; }
+        public bool RememberMe { get; set; }
+    }
+
+
+
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            if (_isHuman)
+            {
+                isLoading = true;
+                // _ = StartCountdown();
+                var userDTO = await _apiServiceLogin.LoginProcessAsync(loginModel);
+                if (userDTO.Data.Email == null)
+                    await ShowAlert(userDTO.Type + ", No Match User, Check your data and Please try again!");
+
+                else if (userDTO.Data.Email != null && !userDTO.Data.IsActivated)
+                    Navigation.NavigateTo($"/activateAccount/{loginModel.Email}");
+
+                else if (userDTO.Data.Email != null && userDTO.Data.IsSwitchedOff)
+                    Navigation.NavigateTo("/SwitchedOnAccountAgain");
+
+                else if (!string.IsNullOrEmpty(userDTO.Data.Token))
+                {
+                    await localStorage.SetItemAsync("AYMauthToken", userDTO.Data.Token);
+                    await GetCurrentUser();
+                    Navigation.NavigateTo("/IndexUser");
+                }
+                isLoading = false;
+            }
+            else
+                await ShowAlert("Wrong Captcha");
+
+            
+        }
+        catch (Exception ex)
+        {
+            // Handle login failure (e.g., show an error message)
+        }
+    }
+
+    protected string GetpackageImage(int package)
+    {
+        if (package == 1)
+            return "css/Images/Default/User1.png";
+        if (package == 2)
+            return "css/Images/Default/User2.png";
+        if (package == 3)
+            return "css/Images/Default/User3.png";
+        if (package == 4)
+            return "css/Images/Default/User4.png";
+        if (package == 5)
+            return "css/Images/Default/User5.png";
+        return string.Empty;
+
+    }
+    public async Task GetCurrentUser()
+    {
+        try
+        {
+            var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+            var user = authState.User;
+            _AppState.isAuthenticated = true;
+
+            _AppState.CurrentUserHistoryDTO = await _apiServiceLogin.GetHistoryWithMainImagesForCurrentUser();
+            _AppState.AllUsers = await _apiServiceLogin.GetUserHistoriesWithMainImagesForAll();
+        }
+        catch (Exception ex)
+        {
+            
+        }
+        // if (_AppState.AllUsers == null)
+        // {
+        //     var x = 10;
+        // }
+
+    }
+    protected override async Task OnInitializedAsync()
+    {
+
+    }
+
+    protected async override Task OnAfterRenderAsync(bool firstRender)
+    {
+
+    }
+
+
+
+}
