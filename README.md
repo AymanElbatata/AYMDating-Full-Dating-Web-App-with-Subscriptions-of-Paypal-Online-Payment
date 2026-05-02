@@ -2,7 +2,7 @@
 
 💍 AYM Dating
 Subscription-Based Matchmaking Web Application
-<p align="center"> <b>Serious Relationships • Marriage Focus • SaaS Ready</b> </p> <p align="center"> <a  target="_blank" href="https://aymdating.runasp.net/">🌐 Live Demo</a> &nbsp;•&nbsp; <a  target="_blank" href="https://payhip.com/b/C4hrG">🛒 Purchase</a> </p>
+<p align="center"> <b>Serious Relationships • Marriage Focus • SaaS Ready</b> </p> <p align="center"> <a target="_blank" href="https://aymdating.runasp.net/">🌐 Live Demo</a> &nbsp;•&nbsp; <a target="_blank" href="https://payhip.com/b/C4hrG">🛒 Purchase</a> </p>
 
 📌 Overview
 
