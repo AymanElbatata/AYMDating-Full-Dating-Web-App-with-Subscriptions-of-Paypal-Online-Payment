@@ -2,7 +2,8 @@
 
 💍 AYM Dating
 Subscription-Based Matchmaking Web Application
-<p align="center"> <b>Serious Relationships • Marriage Focus • SaaS Ready</b> </p> <p align="center"> <a href="https://aymdating.runasp.net/">🌐 Live Demo</a> &nbsp;•&nbsp; <a href="https://payhip.com/b/C4hrG">🛒 Purchase</a> </p>
+<p align="center"> <b>Serious Relationships • Marriage Focus • SaaS Ready</b> </p> <p align="center"> <a  target="_blank" href="https://aymdating.runasp.net/">🌐 Live Demo</a> &nbsp;•&nbsp; <a  target="_blank" href="https://payhip.com/b/C4hrG">🛒 Purchase</a> </p>
+
 📌 Overview
 
 AYM Dating is a subscription-based matchmaking platform designed for serious relationships and marriage.
