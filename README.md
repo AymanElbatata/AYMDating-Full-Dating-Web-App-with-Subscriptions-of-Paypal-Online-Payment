@@ -12,6 +12,28 @@ It allows users to create profiles, discover compatible matches, and communicate
 
 Built as a SaaS-ready application, it supports monetization through subscription plans and premium features.
 
+## 📸 Preview
+
+<p align="center">
+  <img src="/Screenshots/001.jpg" width="45%" />
+  <img src="/Screenshots/002.jpg" width="45%" />
+</p>
+
+<p align="center">
+  <img src="/Screenshots/003.jpg" width="45%" />
+  <img src="/Screenshots/004.jpg" width="45%" />
+</p>
+
+<p align="center">
+  <img src="/Screenshots/005.jpg" width="45%" />
+  <img src="/Screenshots/006.jpg" width="45%" />
+</p>
+
+<p align="center">
+  <img src="/Screenshots/007.jpg" width="45%" />
+  <img src="/Screenshots/008.jpg" width="45%" />
+</p>
+
 ✨ Features
 
 👤 User Profiles
