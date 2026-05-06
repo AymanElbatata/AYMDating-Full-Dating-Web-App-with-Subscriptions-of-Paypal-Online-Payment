@@ -1,4 +1,4 @@
-# AYMDating – Full Dating Web App with Subscriptions of Paypal Online Payment
+# AYMDating – Full Dating Subscriptions of Paypal Online Payment Web App (Source Code + Database)
 
 💍 AYM Dating
 Subscription-Based Matchmaking Web Application
